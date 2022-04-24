@@ -10,6 +10,7 @@
     <q-form ref="form" class="q-gutter-md">
       <q-card-section>
         <q-input
+          :error="v$.credentials.email.$error"
           name="email"
           id="email"
           v-model.trim="credentials.email"
@@ -18,6 +19,7 @@
           autofocus
         />
         <q-input
+          :error="v$.credentials.password.$error"
           id="password"
           name="password"
           v-model="credentials.password"
@@ -57,9 +59,29 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { RouteLocationRaw } from 'vue-router'
+import { useVuelidate } from '@vuelidate/core'
+import {
+  required,
+  helpers
+} from '@vuelidate/validators'
 
 export default defineComponent({
   name: 'LoginPage',
+  setup () {
+    return { v$: useVuelidate({ $autoDirty: true }) }
+  },
+  validations () {
+    return {
+      credentials: {
+        email: {
+          required: helpers.withMessage('Zadajte e-mail', required)
+        },
+        password: {
+          required: helpers.withMessage('Zadajte heslo', required)
+        }
+      }
+    }
+  },
   data () {
     return {
       credentials: { email: '', password: '', remember: false },
@@ -75,8 +97,20 @@ export default defineComponent({
     }
   },
   methods: {
-    onSubmit () {
-      this.$store.dispatch('auth/login', this.credentials).then(() => this.$router.push(this.redirectTo))
+    async onSubmit () {
+      const isFormValid = await this.v$.$validate()
+      if (!isFormValid) {
+        this.v$.$errors.map((e) =>
+          this.$q.notify({
+            color: 'red-4',
+            icon: 'warning',
+            position: 'bottom-right',
+            message: e.$message.toString()
+          })
+        )
+      } else {
+        this.$store.dispatch('auth/login', this.credentials).then(() => this.$router.push(this.redirectTo))
+      }
     }
   }
 })
