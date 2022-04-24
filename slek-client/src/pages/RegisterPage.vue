@@ -19,6 +19,24 @@
           autofocus
         />
         <q-input
+          :error="v$.form.fullname.$error"
+          name="fullname"
+          id="fullname"
+          v-model.trim="form.fullname"
+          type="fullname"
+          label="Name and Lastname"
+          autofocus
+        />
+        <q-input
+          :error="v$.form.nickname.$error"
+          name="nickname"
+          id="nickname"
+          v-model.trim="form.nickname"
+          type="nickname"
+          label="Nickname"
+          autofocus
+        />
+        <q-input
           :error="v$.form.password.$error"
           id="password"
           name="password"
@@ -89,6 +107,12 @@ export default defineComponent({
         email: {
           required: helpers.withMessage('Zadajte e-mail', required)
         },
+        fullname: {
+          required: helpers.withMessage('Zadajte cele meno', required)
+        },
+        nickname: {
+          required: helpers.withMessage('Zadajte pouzivatelske meno', required)
+        },
         password: {
           required: helpers.withMessage('Zadajte heslo', required),
           minLength: helpers.withMessage('Heslo musi mat minimalne 8 znakov', minLength(8))
@@ -101,7 +125,7 @@ export default defineComponent({
   },
   data () {
     return {
-      form: { email: '', password: '', passwordConfirmation: '' },
+      form: { email: '', fullname: '', nickname: '', password: '', passwordConfirmation: '' },
       showPassword: false
     }
   },
