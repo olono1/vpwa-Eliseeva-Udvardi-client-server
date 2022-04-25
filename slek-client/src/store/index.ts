@@ -8,6 +8,7 @@ import {
 
 import auth from './module-auth'
 import channels from './module-channels'
+import users from './users'
 import type { AuthStateInterface } from './module-auth/state'
 import type { ChannelsStateInterface } from './module-channels/state'
 
@@ -42,7 +43,8 @@ export default store(function (/* { ssrContext } */) {
   const Store = createStore<StateInterface>({
     modules: {
       auth,
-      channels
+      channels,
+      users
     },
 
     // enable strict mode (adds overhead!)
