@@ -17,7 +17,8 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
   },
   async leave ({ getters, commit }, channel: string | null) {
     const leaving: string[] = channel !== null ? [channel] : getters.joinedChannels
-
+    console.log('leaving all channels')
+    console.log(leaving)
     leaving.forEach((c) => {
       channelService.leave(c)
       commit('CLEAR_CHANNEL', c)
@@ -26,6 +27,28 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
   async addMessage ({ commit }, { channel, message }: { channel: string, message: RawMessage }) {
     const newMessage = await channelService.in(channel)?.addMessage(message)
     commit('NEW_MESSAGE', { channel, message: newMessage })
+  },
+  async goOffline ({ getters }) {
+    const leaving: string[] = getters.joinedChannels
+    leaving.forEach((c) => {
+      channelService.leave(c)
+    })
+  },
+  async goOnline ({ getters, commit }) {
+    try {
+      const joining: string[] = getters.joinedChannels
+      const selectedChannel: string = getters.activeChannel
+      joining.forEach(async (c) => {
+        commit('CLEAR_CHANNEL', c)
+        commit('LOADING_START')
+        const messages = await channelService.join(c).loadMessages()
+        commit('LOADING_SUCCESS', { channel: c, messages })
+      })
+      commit('SET_ACTIVE', selectedChannel)
+    } catch (err) {
+      commit('LOADING_ERROR', err)
+      throw err
+    }
   }
 }
 

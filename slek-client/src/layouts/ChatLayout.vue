@@ -40,8 +40,11 @@
                 <q-item clickable @click="logout">
                   <q-item-section>Logout</q-item-section>
                 </q-item>
-                <q-item clickable @click="leave">
+                <q-item clickable @click="goOffline">
                   <q-item-section>Go offline</q-item-section>
+                </q-item>
+                <q-item clickable @click="goOnline">
+                  <q-item-section>Go back online</q-item-section>
                 </q-item>
               </q-list>
             </q-menu>
@@ -132,7 +135,7 @@ export default defineComponent({
       setActiveChannel: 'SET_ACTIVE'
     }),
     ...mapActions('auth', ['logout']),
-    ...mapActions('channels', ['addMessage', 'leave', 'join'])
+    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline'])
   }
 })
 </script>
