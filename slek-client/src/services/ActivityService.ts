@@ -1,9 +1,9 @@
-import { User } from 'src/contracts'
+import { SerializedMessage, User } from 'src/contracts'
 import { authManager } from '.'
-import { SocketManager } from './SocketManager'
+import { BootParams, SocketManager } from './SocketManager'
 
 class ActivitySocketManager extends SocketManager {
-  public subscribe (): void {
+  public subscribe ({ store }: BootParams): void {
     this.socket.on('user:list', (onlineUsers: User[]) => {
       console.log('Online users list', onlineUsers)
     })
@@ -16,6 +16,11 @@ class ActivitySocketManager extends SocketManager {
       console.log('User is offline', user)
     })
 
+    this.socket.on('user:stateOffline', (user:User) => {
+      console.log('User went status offline', user)
+      console.log(user.nickname)
+    })
+
     authManager.onChange((token) => {
       if (token) {
         this.socket.connect()
@@ -23,6 +28,10 @@ class ActivitySocketManager extends SocketManager {
         this.socket.disconnect()
       }
     })
+  }
+
+  public notifyStateChange (newState: string): Promise<SerializedMessage> {
+    return this.emitAsync('goOffline', newState)
   }
 }
 

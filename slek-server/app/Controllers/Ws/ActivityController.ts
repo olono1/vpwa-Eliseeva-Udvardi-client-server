@@ -31,6 +31,9 @@ export default class ActivityController {
 
     const onlineUsers = await User.findMany([...onlineIds])
 
+    console.log("Sending online users")
+    console.log(onlineUsers)
+
     socket.emit('user:list', onlineUsers)
 
     logger.info('new websocket connection')
@@ -49,5 +52,17 @@ export default class ActivityController {
 
     logger.info('websocket disconnected', reason)
     socket.broadcast.emit('User changed state to offline', auth.user)
+  }
+
+  public async goOffline({ socket, auth, logger }: WsContextContract, reason: string) {
+    console.log('offline backend initiated')
+    const room = this.getUserRoom(auth.user!);
+    const userSockets = await socket.in(room).allSockets()
+
+    console.log(auth.user)
+    socket.broadcast.emit('user:stateOffline', auth.user)
+
+    logger.info('User wentOffline', reason);
+
   }
 }

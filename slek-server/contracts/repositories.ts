@@ -11,6 +11,8 @@ declare module '@ioc:Repositories/MessageRepository' {
     author: {
       id: number,
       email: string,
+      fullname: string,
+      nickname: string,
       createdAt: string,
       updatedAt: string
     }

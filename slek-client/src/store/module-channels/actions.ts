@@ -1,7 +1,7 @@
 import { ActionTree } from 'vuex'
 import { StateInterface } from '../index'
 import { ChannelsStateInterface } from './state'
-import { channelService } from 'src/services'
+import { channelService, activityService } from 'src/services'
 import { RawMessage } from 'src/contracts'
 
 const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
@@ -33,6 +33,7 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
     leaving.forEach((c) => {
       channelService.leave(c)
     })
+    activityService.notifyStateChange('offline')
   },
   async goOnline ({ getters, commit }) {
     try {

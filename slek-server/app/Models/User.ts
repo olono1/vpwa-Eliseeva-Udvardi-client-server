@@ -22,10 +22,10 @@ export default class User extends BaseModel {
   @column({ serializeAs: null })
   public password: string
 
-  @column({ serializeAs: null })
+  @column()
   public fullname: string
 
-  @column({ serializeAs: null })
+  @column()
   public nickname: string
 
   @column()
