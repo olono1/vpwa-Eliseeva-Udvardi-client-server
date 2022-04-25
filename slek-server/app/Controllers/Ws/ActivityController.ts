@@ -48,5 +48,6 @@ export default class ActivityController {
     }
 
     logger.info('websocket disconnected', reason)
+    socket.broadcast.emit('User changed state to offline', auth.user)
   }
 }
