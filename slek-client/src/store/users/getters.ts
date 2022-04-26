@@ -1,4 +1,4 @@
-import { User, UserStatus } from 'src/contracts'
+import { User } from 'src/contracts'
 import { GetterTree } from 'vuex'
 import { StateInterface } from '../index'
 import { UsersStateInterface } from './state'

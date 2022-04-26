@@ -1,4 +1,4 @@
-import { User, UserStatus } from 'src/contracts'
+import { User } from 'src/contracts'
 import { ActionTree } from 'vuex'
 import { StateInterface } from '../index'
 import { UsersStateInterface } from './state'
@@ -7,7 +7,7 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
   someAction (/* context */) {
     // your code
   },
-  async updateStateOrCreateUser ({ commit, getters, dispatch }, { state, user }: { state: 'offline' | 'online' | 'DND', user: User }) {
+  async updateStateOrCreateUser ({ commit, dispatch }, { state, user }: { state: 'offline' | 'online' | 'DND', user: User }) {
     const isUserCreated: Promise<string> = await dispatch('getMessageAuthorStatus', user.email)
     if (await isUserCreated) {
       commit('CHANGE_STATUS', { userStatus: state, user })

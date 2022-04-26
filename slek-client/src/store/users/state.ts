@@ -1,4 +1,4 @@
-import { User, UserStatus } from 'src/contracts'
+import { User } from 'src/contracts'
 
 export interface UsersStateInterface {
   users: { [userEmail: string]: User }
