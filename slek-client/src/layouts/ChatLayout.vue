@@ -40,10 +40,10 @@
                 <q-item clickable @click="logout">
                   <q-item-section>Logout</q-item-section>
                 </q-item>
-                <q-item clickable @click="goOffline">
+                <q-item clickable @click="offline">
                   <q-item-section>Go offline</q-item-section>
                 </q-item>
-                <q-item clickable @click="goOnline">
+                <q-item clickable @click="online">
                   <q-item-section>Go back online</q-item-section>
                 </q-item>
               </q-list>
@@ -167,7 +167,10 @@ export default defineComponent({
           console.log('Command')
           const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: params.slice(1) })
           console.log(response)
-          if (response) {
+          if (response.status === 200 && params[0] === '/join') {
+            this.join(params[1])
+          }
+          if (response.data && params[0] === '/list') {
             this.users = response
             this.alert = true
           }
@@ -179,6 +182,14 @@ export default defineComponent({
         }
       }
       this.message = ''
+      this.loading = false
+    },
+    offline () {
+      this.goOffline()
+      this.loading = true
+    },
+    online () {
+      this.goOnline()
       this.loading = false
     },
     ...mapMutations('channels', {
