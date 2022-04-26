@@ -62,7 +62,8 @@ import { RouteLocationRaw } from 'vue-router'
 import { useVuelidate } from '@vuelidate/core'
 import {
   required,
-  helpers
+  helpers,
+  email
 } from '@vuelidate/validators'
 
 export default defineComponent({
@@ -74,7 +75,8 @@ export default defineComponent({
     return {
       credentials: {
         email: {
-          required: helpers.withMessage('Zadajte e-mail', required)
+          required: helpers.withMessage('Zadajte e-mail', required),
+          email: helpers.withMessage('Zadajte platnu emailovu adresu', email)
         },
         password: {
           required: helpers.withMessage('Zadajte heslo', required)
