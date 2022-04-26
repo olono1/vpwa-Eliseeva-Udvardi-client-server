@@ -171,7 +171,7 @@ export default defineComponent({
             this.join(params[1])
           }
           if (response.data && params[0] === '/list') {
-            this.users = response
+            this.users = response.data
             this.alert = true
           }
         }
