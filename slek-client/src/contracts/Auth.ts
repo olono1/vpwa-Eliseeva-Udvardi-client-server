@@ -24,7 +24,12 @@ export interface User {
   email: string,
   nickname: string,
   fullname: string,
-  state: 'online' | 'offline' | 'DND'
+  userStatus: 'online' | 'offline' | 'DND'
   createdAt: string,
   updatedAt: string
+}
+
+export interface UserStatus {
+  email: string,
+  userStatus: 'online' | 'offline' | 'DND'
 }

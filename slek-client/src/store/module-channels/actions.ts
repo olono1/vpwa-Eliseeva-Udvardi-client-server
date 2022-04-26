@@ -46,6 +46,7 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
         commit('LOADING_SUCCESS', { channel: c, messages })
       })
       commit('SET_ACTIVE', selectedChannel)
+      activityService.notifyStateChange('online')
     } catch (err) {
       commit('LOADING_ERROR', err)
       throw err

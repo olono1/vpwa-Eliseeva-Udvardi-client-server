@@ -1,15 +1,13 @@
-import { User } from "src/contracts";
+import { User, UserStatus } from 'src/contracts'
 
 export interface UsersStateInterface {
-  prop: boolean;
-  users: Array<User> | null;
+  users: { [userEmail: string]: User }
 }
 
-function state(): UsersStateInterface {
+function state (): UsersStateInterface {
   return {
-    prop: false,
-    users: null
-  };
+    users: {}
+  }
 }
 
-export default state;
+export default state

@@ -4,9 +4,11 @@
       <q-chat-message v-for="message in messages"
         :key="message.id"
         :name="message.author.email"
+        :label="this.userStates[message.author.email]? this.userStates[message.author.email].userStatus: 'online'"
         :text="[message.content]"
         :stamp="message.createdAt"
         :sent="isMine(message)"
+        :abc="getStatus(message.author.email)"
       />
     </div>
   </q-scroll-area>
@@ -16,6 +18,7 @@
 import { QScrollArea } from 'quasar'
 import { SerializedMessage } from 'src/contracts'
 import { defineComponent, PropType } from 'vue'
+import { mapActions } from 'vuex'
 
 export default defineComponent({
   name: 'ChannelMessagesComponent',
@@ -36,6 +39,9 @@ export default defineComponent({
   computed: {
     currentUser () {
       return this.$store.state.auth.user?.id
+    },
+    userStates () {
+      return this.$store.state.users.users
     }
   },
   methods: {
@@ -45,7 +51,12 @@ export default defineComponent({
     },
     isMine (message: SerializedMessage): boolean {
       return message.author.id === this.currentUser
-    }
+    },
+    async getStatus (email: string): Promise<string> {
+      const statusUser = await this.getMessageAuthorStatus(email)
+      return statusUser
+    },
+    ...mapActions('users', ['getMessageAuthorStatus'])
   }
 })
 </script>

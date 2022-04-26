@@ -11,6 +11,7 @@ import channels from './module-channels'
 import users from './users'
 import type { AuthStateInterface } from './module-auth/state'
 import type { ChannelsStateInterface } from './module-channels/state'
+import { UsersStateInterface } from './users/state'
 
 /*
  * If not building with SSR mode, you can
@@ -27,6 +28,7 @@ export interface StateInterface {
   // Declared as unknown to avoid linting issue. Best to strongly type as per the line above.
   auth: AuthStateInterface
   channels: ChannelsStateInterface
+  users: UsersStateInterface
 }
 
 // provide typings for `this.$store`

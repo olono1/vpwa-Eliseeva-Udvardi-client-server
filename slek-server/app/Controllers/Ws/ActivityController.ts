@@ -59,8 +59,16 @@ export default class ActivityController {
     const room = this.getUserRoom(auth.user!);
     const userSockets = await socket.in(room).allSockets()
 
-    console.log(auth.user)
-    socket.broadcast.emit('user:stateOffline', auth.user)
+
+    if(reason === 'offline') {
+     
+      socket.broadcast.emit('user:stateOffline', auth.user)
+    }
+    if (reason === 'online') {
+      
+      socket.broadcast.emit('user:stateOnline', auth.user)
+    }
+
 
     logger.info('User wentOffline', reason);
 
