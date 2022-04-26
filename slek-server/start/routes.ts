@@ -30,3 +30,10 @@ Route.group(() => {
   Route.post('logout', 'AuthController.logout').middleware('auth')
   Route.get('me', 'AuthController.me').middleware('auth')
 }).prefix('auth')
+
+Route.group(() => {
+  Route.post('cancel', 'CommandsController.cancel')
+  Route.post('join', 'CommandsController.join')
+  Route.post('list', 'CommandsController.list')
+  // Route.get('me', 'AuthController.me').middleware('auth')
+}).prefix('command')

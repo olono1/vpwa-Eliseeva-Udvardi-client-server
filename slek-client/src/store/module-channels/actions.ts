@@ -51,6 +51,27 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       commit('LOADING_ERROR', err)
       throw err
     }
+  },
+  async sendCommand ({ commit }, { channel, command, params }: { channel: string, command: string, params: Array<string> }) {
+    const response = await channelService.command(channel, command, params)
+    if (response.status === 200 && command === '/cancel') {
+      await channelService.leave(params[0])
+      commit('CLEAR_CHANNEL', params[0])
+    } else if (response.status === 200 && command === '/join') {
+      try {
+        const channelName = params[0]
+        console.log('channelname')
+        console.log(channelName)
+        commit('LOADING_START')
+        const messages = await channelService.join(channelName).loadMessages()
+        commit('LOADING_SUCCESS', { channelName, messages })
+      } catch (err) {
+        commit('LOADING_ERROR', err)
+        throw err
+      }
+    } else if (response.status === 200 && command === '/list') {
+      return response.data
+    }
   }
 }
 

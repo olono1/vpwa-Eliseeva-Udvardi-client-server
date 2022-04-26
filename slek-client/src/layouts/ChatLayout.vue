@@ -50,6 +50,34 @@
             </q-menu>
           </q-btn>
 
+          <q-dialog v-model="alert">
+            <q-card>
+              <q-card-section>
+                <div class="text-h6">Users of the channel</div>
+              </q-card-section>
+
+              <q-card-section class="q-pt-none">
+                <q-list>
+                  <q-item
+                    v-for="(user, index) in users"
+                    :key="index"
+                    v-ripple
+                  >
+                    <q-item-section>
+                      <q-item-label lines="1">
+                        {{ user }}
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-list>
+              </q-card-section>
+
+              <q-card-actions align="right">
+                <q-btn flat label="OK" color="primary" v-close-popup />
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+
           <q-btn
             round
             flat
@@ -103,7 +131,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default defineComponent({
@@ -112,7 +140,10 @@ export default defineComponent({
     return {
       leftDrawerOpen: false,
       message: '',
-      loading: false
+      loading: false,
+      commands: ['/join', '/invite', '/revoke', '/kick', '/quit', '/cancel', '/list'],
+      users: [],
+      alert: ref(false)
     }
   },
   computed: {
@@ -127,7 +158,26 @@ export default defineComponent({
   methods: {
     async send () {
       this.loading = true
-      await this.addMessage({ channel: this.activeChannel, message: this.message })
+      const index = this.message.indexOf('/')
+      console.log('Check')
+      console.log(this.message)
+      if (index === 0) {
+        const params = this.message.split(' ')
+        if (this.commands.includes(params[0])) {
+          console.log('Command')
+          const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: params.slice(1) })
+          console.log(response)
+          if (response) {
+            this.users = response
+            this.alert = true
+          }
+        }
+      } else {
+        if (this.activeChannel != null) {
+          console.log('Send')
+          await this.addMessage({ channel: this.activeChannel, message: this.message })
+        }
+      }
       this.message = ''
       this.loading = false
     },
@@ -135,7 +185,7 @@ export default defineComponent({
       setActiveChannel: 'SET_ACTIVE'
     }),
     ...mapActions('auth', ['logout']),
-    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline'])
+    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline', 'leave', 'join', 'sendCommand'])
   }
 })
 </script>
@@ -181,3 +231,11 @@ export default defineComponent({
   margin-top: 0!important
   font-size: 1.4rem
 </style>
+
+function ref(arg0: boolean) {
+  throw new Error('Function not implemented.')
+}
+
+function ref(arg0: boolean) {
+  throw new Error('Function not implemented.')
+}

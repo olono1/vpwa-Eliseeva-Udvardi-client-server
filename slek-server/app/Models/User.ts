@@ -31,6 +31,11 @@ export default class User extends BaseModel {
   @column()
   public rememberMeToken?: string
 
+  @hasMany(() => Channel, {
+    foreignKey: 'owner_id',
+  })
+  public createdChannels: HasMany<typeof Channel>
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

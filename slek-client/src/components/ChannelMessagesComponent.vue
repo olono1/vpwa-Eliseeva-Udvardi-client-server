@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { QScrollArea } from 'quasar'
-import { SerializedMessage } from 'src/contracts'
+import { SerializedMessage } from '../contracts'
 import { defineComponent, PropType } from 'vue'
 import { mapActions } from 'vuex'
 

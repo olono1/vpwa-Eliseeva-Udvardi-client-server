@@ -19,11 +19,17 @@ export interface LoginCredentials {
   remember: boolean
 }
 
+export interface Channel {
+  id: number,
+  name: string
+}
+
 export interface User {
   id: number
   email: string,
   nickname: string,
   fullname: string,
+  channels: Array<Channel>,
   userStatus: 'online' | 'offline' | 'DND'
   createdAt: string,
   updatedAt: string
