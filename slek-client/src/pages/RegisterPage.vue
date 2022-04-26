@@ -93,7 +93,9 @@ import { useVuelidate } from '@vuelidate/core'
 import {
   minLength,
   required,
-  helpers
+  helpers,
+  email,
+  sameAs
 } from '@vuelidate/validators'
 
 export default defineComponent({
@@ -105,7 +107,8 @@ export default defineComponent({
     return {
       form: {
         email: {
-          required: helpers.withMessage('Zadajte e-mail', required)
+          required: helpers.withMessage('Zadajte e-mail', required),
+          email: helpers.withMessage('Zadajte platnu emailovu adresu', email)
         },
         fullname: {
           required: helpers.withMessage('Zadajte cele meno', required)
@@ -118,7 +121,8 @@ export default defineComponent({
           minLength: helpers.withMessage('Heslo musi mat minimalne 8 znakov', minLength(8))
         },
         passwordConfirmation: {
-          required: helpers.withMessage('Potvrdte heslo', required)
+          required: helpers.withMessage('Potvrdte heslo', required),
+          sameAsPasword: sameAs(this.form.password)
         }
       }
     }
