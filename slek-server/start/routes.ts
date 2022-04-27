@@ -35,5 +35,5 @@ Route.group(() => {
   Route.post('cancel', 'CommandsController.cancel')
   Route.post('join', 'CommandsController.join')
   Route.post('list', 'CommandsController.list')
-  // Route.get('me', 'AuthController.me').middleware('auth')
+  Route.post('invite', 'CommandsController.invite')
 }).prefix('command')

@@ -73,4 +73,31 @@ export default class ActivityController {
     logger.info('User wentOffline', reason);
 
   }
+
+  public async onInvite({ socket, auth, logger }: WsContextContract, userNickname: string, channel: string) {
+    // all connections for the same authenticated user will be in the room
+    const user = await User.findBy('nickname', userNickname)
+    const room = this.getUserRoom(user)
+    const userSockets = await socket.in(room).allSockets()
+    console.log(userSockets)
+
+    // add this socket to user room
+    socket.join(room)
+    // add userId to data shared between Socket.IO servers
+    // https://socket.io/docs/v4/server-api/#namespacefetchsockets
+    socket.data.userId = user!.id
+
+    const allSockets = await socket.nsp.fetchSockets()
+
+    for (const remoteSocket of allSockets) {
+      console.log('PRECHDAZAM SOCKETMI')
+      console.log(remoteSocket.data)
+      console.log(user.id)
+      if (remoteSocket.data.userId === user.id){
+        remoteSocket.emit('user:channels', user, channel)
+        console.log('NASIEL SOM')
+        break;
+      }
+    }
+  }
 }
