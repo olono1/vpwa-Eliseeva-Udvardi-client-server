@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database'
 import Channel from 'App/Models/Channel'
 import User from 'App/Models/User'
 import RegisterUserValidator from 'App/Validators/RegisterUserValidator'
@@ -10,6 +11,11 @@ export default class AuthController {
     // join user to general channel
     const general = await Channel.findByOrFail('name', 'general')
     await user.related('channels').attach([general.id])
+    //const userChannelRow = await Database.from('channel_users')
+                                        // .where('user_id', user.id)
+                                        // .andWhere('channel_id', general.id)
+                                        // .update({channel_state: 'member'})
+    //console.log(userChannelRow);
 
     return user
   }
