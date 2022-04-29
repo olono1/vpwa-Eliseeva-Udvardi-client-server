@@ -25,6 +25,13 @@ export default class CommandsController {
     await user.related('channels').attach([channel.id]) // funguje insert do DB
     // console.log(channel)
   }
+  
+  async invite({ request }: HttpContextContract) {
+    // console.log(request)
+    let channel = await Channel.findBy('name', request.body().channel)
+    const user = await User.findByOrFail('nickname', request.body().params[0])
+    await user.related('channels').attach([channel.id]) // funguje insert do DB
+  }
 
   async list({request}: HttpContextContract) {
     console.log(request)

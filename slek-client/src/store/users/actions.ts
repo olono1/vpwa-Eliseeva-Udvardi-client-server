@@ -23,6 +23,12 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
     } else {
       return userToReturn.userStatus
     }
+  },
+  async updateChannelList ({ dispatch }, { user, channel }: {user: User, channel: string}) {
+    await dispatch('auth/check', '', { root: true })
+    await dispatch('channels/join', channel, { root: true })
+    console.log(user)
+    console.log(channel)
   }
 
 }

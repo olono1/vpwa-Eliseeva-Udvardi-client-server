@@ -6,6 +6,7 @@ import { LoginCredentials, RegisterData } from 'src/contracts'
 
 const actions: ActionTree<AuthStateInterface, StateInterface> = {
   async check ({ state, commit, dispatch }) {
+    console.log('CHECK!')
     try {
       commit('AUTH_START')
       const user = await authService.me()

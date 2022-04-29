@@ -36,6 +36,7 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
     activityService.notifyStateChange('offline')
   },
   async goOnline ({ getters, commit }) {
+    console.log('GO ONLINE')
     try {
       const joining: string[] = getters.joinedChannels
       const selectedChannel: string = getters.activeChannel
@@ -52,11 +53,17 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       throw err
     }
   },
+  async channel () {
+    console.log('!!!!!!')
+  },
   async sendCommand ({ commit }, { channel, command, params }: { channel: string, command: string, params: Array<string> }) {
     const response = await channelService.command(channel, command, params)
     if (response.status === 200 && command === '/cancel') {
       await channelService.leave(params[0])
       commit('CLEAR_CHANNEL', params[0])
+    } else if (response.status === 200 && command === '/invite') {
+      console.log(response.data)
+      activityService.notifyChannelChange(params[0], channel)
     }
     return response
   }
