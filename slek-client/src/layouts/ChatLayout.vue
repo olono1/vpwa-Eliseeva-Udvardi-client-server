@@ -50,6 +50,19 @@
             </q-menu>
           </q-btn>
 
+          <q-dialog v-model="invite" persistent>
+            <q-card>
+              <q-card-section class="row items-center">
+                <span class="q-ml-sm">You got invite</span>
+              </q-card-section>
+
+              <q-card-actions align="right">
+                <q-btn flat label="Do not accept" color="primary" @click="leaveInvite(activeChannel)" v-close-popup></q-btn>
+                <q-btn flat label="Accept" color="primary" @click="joinInvite(activeChannel)" v-close-popup></q-btn>
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+
           <q-dialog v-model="alert">
             <q-card>
               <q-card-section>
@@ -90,6 +103,21 @@
         <q-scroll-area style="height: calc(100% - 100px)">
           <q-list>
             <q-item
+              v-for="(invite_item, index) in invites"
+              :key="index"
+              clickable
+              v-ripple
+              @click="showInvite(invite_item)"
+            >
+
+              <q-item-section side >
+                {{ invite_item }}
+              </q-item-section>
+            </q-item>
+          </q-list>
+
+          <q-list>
+            <q-item
               v-for="(channel, index) in channels"
               :key="index"
               clickable
@@ -103,13 +131,6 @@
                 <q-item-label class="conversation__summary" caption>
                   {{ lastMessageOf(channel)?.content || '' }}
                 </q-item-label>
-              </q-item-section>
-
-              <q-item-section side>
-                <!--q-item-label caption>
-                  {{ channel }}
-                </q-item-label-->
-                <q-icon name="keyboard_arrow_down" />
               </q-item-section>
             </q-item>
           </q-list>
@@ -143,7 +164,8 @@ export default defineComponent({
       loading: false,
       commands: ['/join', '/invite', '/revoke', '/kick', '/quit', '/cancel', '/list'],
       users: [],
-      alert: ref(false)
+      alert: ref(false),
+      invite: ref(false)
     }
   },
   computed: {
@@ -153,9 +175,27 @@ export default defineComponent({
     }),
     activeChannel () {
       return this.$store.state.channels.active
+    },
+    invites () {
+      return this.$store.state.channels.invites
     }
   },
   methods: {
+    async showInvite (channel: string) {
+      this.setActiveChannel(channel)
+      this.invite = true
+    },
+    async joinInvite (channel: string) {
+      if (this.invites != null) {
+        this.invites.splice(this.invites.indexOf(channel), 1)
+      }
+    },
+    async leaveInvite (channel: string) {
+      this.leave(channel)
+      if (this.invites != null) {
+        this.invites.splice(this.invites.indexOf(channel), 1)
+      }
+    },
     async send () {
       this.loading = true
       const index = this.message.indexOf('/')

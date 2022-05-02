@@ -24,6 +24,9 @@ const mutation: MutationTree<ChannelsStateInterface> = {
   },
   NEW_MESSAGE (state, { channel, message }: { channel: string, message: SerializedMessage }) {
     state.messages[channel].push(message)
+  },
+  GET_INVITE (state, channel: string) {
+    state.invites?.push(channel)
   }
 }
 

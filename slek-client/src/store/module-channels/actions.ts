@@ -28,6 +28,16 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
     const newMessage = await channelService.in(channel)?.addMessage(message)
     commit('NEW_MESSAGE', { channel, message: newMessage })
   },
+  async getInvite ({ commit }, channel: string) {
+    try {
+      console.log('commit get invite')
+      console.log(channel)
+      commit('GET_INVITE', { channel })
+    } catch (err) {
+      commit('LOADING_ERROR', err)
+      throw err
+    }
+  },
   async goOffline ({ getters }) {
     const leaving: string[] = getters.joinedChannels
     leaving.forEach((c) => {
@@ -52,9 +62,6 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       commit('LOADING_ERROR', err)
       throw err
     }
-  },
-  async channel () {
-    console.log('!!!!!!')
   },
   async sendCommand ({ commit }, { channel, command, params }: { channel: string, command: string, params: Array<string> }) {
     const response = await channelService.command(channel, command, params)

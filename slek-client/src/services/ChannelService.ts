@@ -32,7 +32,6 @@ class ChannelService {
     if (this.channels.has(name)) {
       throw new Error(`User is already joined in channel "${name}"`)
     }
-
     // connect to given channel namespace
     const channel = new ChannelSocketManager(`/channels/${name}`)
     this.channels.set(name, channel)
