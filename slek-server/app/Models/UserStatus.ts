@@ -1,5 +1,6 @@
 export enum userStatus {
   INVITED = 'invited',
   MEMBER = 'member',
-  BANNED = 'banned'
+  BANNED = 'banned',
+  LEFT = "left"
 }

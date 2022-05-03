@@ -11,11 +11,23 @@ export default class CommandsController {
     const channel = await Channel.findByOrFail('name', request.body().params[0])
     // console.log(channel)
     const user = await User.findByOrFail('id', request.body().user.id)
+    const info = await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
     if (channel.owner_id == request.body().user.id){
       await channel.delete()
+      await user.related('channels').detach([channel.id]) // funguje delete z DB
       return
     }
-    await user.related('channels').detach([channel.id]) // funguje delete z DB
+    console.log('Info')
+    console.log(info)
+    if (info.length > 0) {
+      await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
+                    .update('user_state', userStatus.LEFT)
+    }
+    // await user.related('channels').detach([channel.id]) // funguje delete z DB
   }
 
   async quit({ request }: HttpContextContract) {
@@ -25,6 +37,38 @@ export default class CommandsController {
       await channel.delete()
     }
     // await user.related('channels').detach([channel.id]) // funguje delete z DB
+  }
+
+  public async getJoinedChannels({ request }: HttpContextContract) {
+    console.log('GOT CHANNELS REQUEST')
+    const filterChannels: string[] = []
+    const response = await Database.from('channel_users')
+                                  .where('user_id', request.body().user.id)
+    for (const x of response) {
+      console.log(x)
+      if (x.user_state == 'member') {
+        const channel = await Channel.findByOrFail('id', x.channel_id)
+        filterChannels.push(channel.name)
+      }
+    }
+    console.log(filterChannels)
+    return filterChannels
+  }
+  
+  public async getInvitedChannels({ request }: HttpContextContract) {
+    console.log('GOT CHANNELS INVITES REQUEST')
+    const filterChannels: string[] = []
+    const response = await Database.from('channel_users')
+                                  .where('user_id', request.body().user.id)
+    for (const x of response) {
+      console.log(x)
+      if (x.user_state == 'invited') {
+        const channel = await Channel.findByOrFail('id', x.channel_id)
+        filterChannels.push(channel.name)
+      }
+    }
+    console.log(filterChannels)
+    return filterChannels
   }
 
   async join({ request }: HttpContextContract) {

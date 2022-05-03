@@ -54,6 +54,24 @@ class ChannelService {
     return this.channels.get(name)
   }
 
+  async getJoinedChannels (): Promise<AxiosResponse> {
+    const user = await authService.me()
+    const response = await api.post('joinedChannels', {
+      user
+    })
+    console.log('!!!!!')
+    return response
+  }
+
+  async getInvitedChannels (): Promise<AxiosResponse> {
+    const user = await authService.me()
+    const response = await api.post('invitedChannels', {
+      user
+    })
+    console.log('!!!!!')
+    return response
+  }
+
   async command (channel: string, command: string, parameters: Array<string>): Promise<AxiosResponse> {
     const user = await authService.me()
     console.log(parameters)
