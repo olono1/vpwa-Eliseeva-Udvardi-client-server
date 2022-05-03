@@ -23,6 +23,7 @@ export default class ChannelUsers extends BaseSchema {
       table.unique(['user_id', 'channel_id'])
       table.integer('kicks')
       table.string('user_state')
+      table.json('kicked_by')
       // 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

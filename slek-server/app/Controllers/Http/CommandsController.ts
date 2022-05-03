@@ -7,6 +7,7 @@ import { userStatus } from 'App/Models/UserStatus'
 export default class CommandsController {
 
   async cancel({ request }: HttpContextContract) {
+    console.log('GOT CANCEL REQUEST')
     const channel = await Channel.findByOrFail('name', request.body().params[0])
     // console.log(channel)
     const user = await User.findByOrFail('id', request.body().user.id)
@@ -15,13 +16,24 @@ export default class CommandsController {
                     .andWhere('channel_id', channel.id)
     if (channel.owner_id == request.body().user.id){
       await channel.delete()
+      await user.related('channels').detach([channel.id]) // funguje delete z DB
       return
     }
-    if (info) {
+    console.log('Info')
+    console.log(info)
+    if (info.length > 0) {
       await Database.from('channel_users')
                     .where('user_id', user.id)
                     .andWhere('channel_id', channel.id)
                     .update('user_state', userStatus.LEFT)
+    }
+  }
+
+  async quit({ request }: HttpContextContract) {
+    const channel = await Channel.findByOrFail('name', request.body().params[0])
+    // console.log(channel)
+    if (channel.owner_id == request.body().user.id){
+      await channel.delete()
     }
     // await user.related('channels').detach([channel.id]) // funguje delete z DB
   }
@@ -37,15 +49,21 @@ export default class CommandsController {
     const info = await Database.from('channel_users')
                     .where('user_id', user.id)
                     .andWhere('channel_id', channel.id)
-                  // .update('state', userStatus.MEMBER)
-                  // .update('kicks', 0)
-    if (info) {
+    
+    console.log('Info')
+    console.log(info)
+    if (info.length > 0) {
       await Database.from('channel_users')
                     .where('user_id', user.id)
                     .andWhere('channel_id', channel.id)
                     .update('user_state', userStatus.MEMBER)
     } else {
       await user.related('channels').attach([channel.id]) // funguje insert do DB
+      await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
+                    .update('user_state', userStatus.MEMBER)
+                    .update('kicks', 0)
     }
   }
   
@@ -53,12 +71,29 @@ export default class CommandsController {
     // console.log(request)
     let channel = await Channel.findByOrFail('name', request.body().channel)
     const user = await User.findByOrFail('nickname', request.body().params[0])
-    await user.related('channels').attach([channel.id]) // funguje insert do DB
-    await Database.from('channel_users')
-                  .where('user_id', user.id)
-                  .andWhere('channel_id', channel.id)
-                  .update('state', userStatus.INVITED)
-                  .update('kicks', 0)
+    const info = await Database.from('channel_users')
+                                .where('user_id', user.id)
+                                .andWhere('channel_id', channel.id)
+    
+    console.log('Info')
+    console.log(info)
+    if (info.length > 0) {
+      for (const c of info) {
+        if (c.user_state == 'member') {
+          return
+        } else if (c.user_state == 'banned') {
+          if (channel.owner_id != request.body().user.id) {
+            return
+          }
+        }
+      }
+      await user.related('channels').attach([channel.id]) // funguje insert do DB
+      await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
+                    .update('state', userStatus.INVITED)
+                    .update('kicks', 0)
+    }
   }
 
   async list({request}: HttpContextContract) {
