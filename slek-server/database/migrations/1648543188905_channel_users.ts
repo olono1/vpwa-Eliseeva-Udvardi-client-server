@@ -1,5 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
-
+import {userStatus} from 'app/Models/UserStatus'
 export default class ChannelUsers extends BaseSchema {
   protected tableName = 'channel_users'
 
@@ -21,6 +21,9 @@ export default class ChannelUsers extends BaseSchema {
         .inTable('channels')
         .onDelete('CASCADE')
       table.unique(['user_id', 'channel_id'])
+      table.integer('kicks')
+      table.string('user_state')
+      // 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

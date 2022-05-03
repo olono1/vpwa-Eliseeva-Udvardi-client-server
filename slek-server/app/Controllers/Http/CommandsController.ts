@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Channel from 'App/Models/Channel'
 import User from 'App/Models/User'
+import { userStatus } from 'App/Models/UserStatus'
 
 export default class CommandsController {
 
@@ -9,28 +10,55 @@ export default class CommandsController {
     const channel = await Channel.findByOrFail('name', request.body().params[0])
     // console.log(channel)
     const user = await User.findByOrFail('id', request.body().user.id)
-    await user.related('channels').detach([channel.id]) // funguje delete z DB
+    const info = await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
     if (channel.owner_id == request.body().user.id){
       await channel.delete()
+      return
     }
+    if (info) {
+      await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
+                    .update('user_state', userStatus.LEFT)
+    }
+    // await user.related('channels').detach([channel.id]) // funguje delete z DB
   }
 
   async join({ request }: HttpContextContract) {
-    console.log(request)
+    console.log("GOT JOIN REQUEST")
+    // console.log(request)
     let channel = await Channel.findBy('name', request.body().params[0])
     if (channel == null){
       channel = await Channel.create({name: request.body().params[0] as string, owner_id: request.body().user.id as number})
     } 
     const user = await User.findByOrFail('id', request.body().user.id)
-    await user.related('channels').attach([channel.id]) // funguje insert do DB
-    // console.log(channel)
+    const info = await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
+                  // .update('state', userStatus.MEMBER)
+                  // .update('kicks', 0)
+    if (info) {
+      await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
+                    .update('user_state', userStatus.MEMBER)
+    } else {
+      await user.related('channels').attach([channel.id]) // funguje insert do DB
+    }
   }
   
   async invite({ request }: HttpContextContract) {
     // console.log(request)
-    let channel = await Channel.findBy('name', request.body().channel)
+    let channel = await Channel.findByOrFail('name', request.body().channel)
     const user = await User.findByOrFail('nickname', request.body().params[0])
     await user.related('channels').attach([channel.id]) // funguje insert do DB
+    await Database.from('channel_users')
+                  .where('user_id', user.id)
+                  .andWhere('channel_id', channel.id)
+                  .update('state', userStatus.INVITED)
+                  .update('kicks', 0)
   }
 
   async list({request}: HttpContextContract) {
