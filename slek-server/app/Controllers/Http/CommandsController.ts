@@ -68,9 +68,11 @@ export default class CommandsController {
   }
   
   async invite({ request }: HttpContextContract) {
+    console.log('GOT INVITE REQUEST')
     // console.log(request)
     let channel = await Channel.findByOrFail('name', request.body().channel)
     const user = await User.findByOrFail('nickname', request.body().params[0])
+    console.log(user)
     const info = await Database.from('channel_users')
                                 .where('user_id', user.id)
                                 .andWhere('channel_id', channel.id)
@@ -87,11 +89,17 @@ export default class CommandsController {
           }
         }
       }
+      await Database.from('channel_users')
+                    .where('user_id', user.id)
+                    .andWhere('channel_id', channel.id)
+                    .update('user_state', userStatus.INVITED)
+                    .update('kicks', 0)
+    } else {
       await user.related('channels').attach([channel.id]) // funguje insert do DB
       await Database.from('channel_users')
                     .where('user_id', user.id)
                     .andWhere('channel_id', channel.id)
-                    .update('state', userStatus.INVITED)
+                    .update('user_state', userStatus.INVITED)
                     .update('kicks', 0)
     }
   }
