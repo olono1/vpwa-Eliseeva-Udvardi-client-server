@@ -32,7 +32,23 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
     try {
       console.log('commit get invite')
       console.log(channel)
-      commit('GET_INVITE', { channel })
+      commit('GET_INVITE', channel)
+    } catch (err) {
+      commit('LOADING_ERROR', err)
+      throw err
+    }
+  },
+  async acceptInvite ({ commit }, channel: string) {
+    try {
+      commit('ACCEPT_INVITE', channel)
+    } catch (err) {
+      commit('LOADING_ERROR', err)
+      throw err
+    }
+  },
+  async removeInvite ({ commit }, channel: string) {
+    try {
+      commit('REMOVE_INVITE', channel)
     } catch (err) {
       commit('LOADING_ERROR', err)
       throw err
@@ -65,10 +81,7 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
   },
   async sendCommand ({ commit }, { channel, command, params }: { channel: string, command: string, params: Array<string> }) {
     const response = await channelService.command(channel, command, params)
-    if (response.status === 200 && command === '/cancel') {
-      await channelService.leave(params[0])
-      commit('CLEAR_CHANNEL', params[0])
-    } else if (response.status === 200 && command === '/invite') {
+    if (response.status === 200 && command === '/invite') {
       console.log(response.data)
       activityService.notifyChannelChange(params[0], channel)
     }

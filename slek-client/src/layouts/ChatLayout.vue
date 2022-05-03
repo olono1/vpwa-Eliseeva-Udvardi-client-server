@@ -186,14 +186,23 @@ export default defineComponent({
       this.invite = true
     },
     async joinInvite (channel: string) {
+      console.log('came to join invite on fe')
       if (this.invites != null) {
-        this.invites.splice(this.invites.indexOf(channel), 1)
+        this.acceptInvite(channel)
+        const response = await this.sendCommand({ channel: channel, command: '/join', params: [channel] })
+        if (response.status === 200) {
+          this.join(channel)
+        }
       }
     },
     async leaveInvite (channel: string) {
       this.leave(channel)
       if (this.invites != null) {
-        this.invites.splice(this.invites.indexOf(channel), 1)
+        this.removeInvite(channel)
+        const response = await this.sendCommand({ channel: channel, command: '/cancel', params: [channel] })
+        if (response.status === 200) {
+          this.leave(channel)
+        }
       }
     },
     async send () {
@@ -209,6 +218,9 @@ export default defineComponent({
           console.log(response)
           if (response.status === 200 && params[0] === '/join') {
             this.join(params[1])
+          }
+          if (response.status === 200 && params[0] === '/cancel') {
+            this.leave(params[1])
           }
           if (response.data && params[0] === '/list') {
             this.users = response.data
@@ -236,7 +248,7 @@ export default defineComponent({
       setActiveChannel: 'SET_ACTIVE'
     }),
     ...mapActions('auth', ['logout']),
-    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline', 'leave', 'join', 'sendCommand'])
+    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline', 'leave', 'join', 'sendCommand', 'acceptInvite', 'removeInvite'])
   }
 })
 </script>

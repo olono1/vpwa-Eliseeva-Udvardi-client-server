@@ -11,22 +11,11 @@ export default class CommandsController {
     const channel = await Channel.findByOrFail('name', request.body().params[0])
     // console.log(channel)
     const user = await User.findByOrFail('id', request.body().user.id)
-    const info = await Database.from('channel_users')
-                    .where('user_id', user.id)
-                    .andWhere('channel_id', channel.id)
     if (channel.owner_id == request.body().user.id){
       await channel.delete()
-      await user.related('channels').detach([channel.id]) // funguje delete z DB
       return
     }
-    console.log('Info')
-    console.log(info)
-    if (info.length > 0) {
-      await Database.from('channel_users')
-                    .where('user_id', user.id)
-                    .andWhere('channel_id', channel.id)
-                    .update('user_state', userStatus.LEFT)
-    }
+    await user.related('channels').detach([channel.id]) // funguje delete z DB
   }
 
   async quit({ request }: HttpContextContract) {

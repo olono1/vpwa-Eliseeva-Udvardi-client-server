@@ -27,6 +27,12 @@ const mutation: MutationTree<ChannelsStateInterface> = {
   },
   GET_INVITE (state, channel: string) {
     state.invites?.push(channel)
+  },
+  ACCEPT_INVITE (state, channel: string) {
+    state.invites?.splice(state.invites?.indexOf(channel), 1)
+  },
+  REMOVE_INVITE (state, channel: string) {
+    state.invites?.splice(state.invites?.indexOf(channel), 1)
   }
 }
 
