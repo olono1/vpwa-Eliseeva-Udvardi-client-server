@@ -8,8 +8,9 @@ export default class CommandsController {
 
   async cancel({ request }: HttpContextContract) {
     console.log('GOT CANCEL REQUEST')
+    console.log(request.body())
     const channel = await Channel.findByOrFail('name', request.body().params[0])
-    // console.log(channel)
+    console.log(channel)
     const user = await User.findByOrFail('id', request.body().user.id)
     const info = await Database.from('channel_users')
                     .where('user_id', user.id)
@@ -152,4 +153,17 @@ export default class CommandsController {
       return usernames
     }
   }
+
+  async getChannelOwner({request}: HttpContextContract){
+    console.log(request)
+    const channel = await Channel.findBy('name', request.body().channel)
+    if (channel != null) {
+      var channel_owner = await User.findByOrFail('id', channel.owner_id)
+      return channel_owner
+
+    }
+    return ''
+
+  }
+
 }
