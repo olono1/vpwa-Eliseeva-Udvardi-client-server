@@ -18,7 +18,7 @@
                 <q-item clickable>
                   <q-item-section>Invite user...</q-item-section>
                 </q-item>
-                <q-item clickable>
+                <q-item clickable @click="listMembers">
                   <q-item-section>List members</q-item-section>
                 </q-item>
                 <q-item clickable>
@@ -250,6 +250,13 @@ export default defineComponent({
       this.message = ''
       this.loading = false
     },
+    async listMembers () {
+      const response = await this.sendCommand({ channel: this.activeChannel, command: '/list' })
+      if (response.data) {
+        this.users = response.data
+        this.alert = true
+      }
+    },
     offline () {
       this.goOffline()
       this.loading = true
@@ -265,7 +272,16 @@ export default defineComponent({
       setActiveChannel: 'SET_ACTIVE'
     }),
     ...mapActions('auth', ['logout']),
-    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline', 'goDndState', 'leave', 'join', 'sendCommand', 'acceptInvite', 'removeInvite'])
+    ...mapActions('channels', [
+      'addMessage',
+      'goOffline',
+      'goOnline',
+      'goDndState',
+      'leave',
+      'join',
+      'sendCommand',
+      'acceptInvite',
+      'removeInvite'])
   }
 })
 </script>
