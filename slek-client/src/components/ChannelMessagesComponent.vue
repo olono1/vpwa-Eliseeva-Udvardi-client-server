@@ -3,8 +3,7 @@
     <div style="width: 100%; max-width: 400px; margin: 0 auto;">
       <q-chat-message v-for="message in messages"
         :key="message.id"
-        :name="message.author.email"
-        :label="this.userStates[message.author.email]? this.userStates[message.author.email].userStatus: 'online'"
+        :name="message.author.email + printStatus(message.author.email)"
         :text="[message.content]"
         :stamp="message.createdAt"
         :sent="isMine(message)"
@@ -51,6 +50,13 @@ export default defineComponent({
     },
     isMine (message: SerializedMessage): boolean {
       return message.author.id === this.currentUser
+    },
+    printStatus (email: string): string {
+      if (this.userStates[email]) {
+        return ' (' + this.userStates[email].userStatus + ')'
+      } else {
+        return ' (online)'
+      }
     },
     async getStatus (email: string): Promise<string> {
       const statusUser = await this.getMessageAuthorStatus(email)
