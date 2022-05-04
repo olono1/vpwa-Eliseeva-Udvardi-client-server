@@ -68,6 +68,9 @@ export default class ActivityController {
       
       socket.broadcast.emit('user:stateOnline', auth.user)
     }
+    if (reason === 'DND') {
+      socket.broadcast.emit('user:stateDND', auth.user)
+    }
 
 
     logger.info('User wentOffline', reason);

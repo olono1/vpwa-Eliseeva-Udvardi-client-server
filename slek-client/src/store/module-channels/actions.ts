@@ -61,11 +61,18 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
     })
     activityService.notifyStateChange('offline')
   },
+  async goDndState () {
+    activityService.notifyStateChange('DND')
+  },
   async goOnline ({ getters, commit }) {
     console.log('GO ONLINE')
     try {
       const joining: string[] = getters.joinedChannels
       const selectedChannel: string = getters.activeChannel
+      const leaving: string[] = getters.joinedChannels
+      leaving.forEach((c) => {
+        channelService.leave(c)
+      })
       joining.forEach(async (c) => {
         commit('CLEAR_CHANNEL', c)
         commit('LOADING_START')

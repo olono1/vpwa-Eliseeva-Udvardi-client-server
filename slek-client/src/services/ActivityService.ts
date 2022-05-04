@@ -25,6 +25,9 @@ class ActivitySocketManager extends SocketManager {
     this.socket.on('user:stateOnline', (user: User) => {
       store.dispatch('users/updateStateOrCreateUser', { state: 'online', user })
     })
+    this.socket.on('user:stateDND', (user:User) => {
+      store.dispatch('users/updateStateOrCreateUser', { state: 'DND', user })
+    })
 
     authManager.onChange((token) => {
       if (token) {

@@ -11,13 +11,25 @@
             @click="leftDrawerOpen = !leftDrawerOpen"
           />
 
-          <q-btn round flat>
+          <q-btn flat>
             <q-avatar color="primary" text-color="white">G</q-avatar>
-          </q-btn>
-
+            <q-menu auto-close :offset="[-30, 8]">
+              <q-list style="min-width: 150px">
+                <q-item clickable>
+                  <q-item-section>Invite user...</q-item-section>
+                </q-item>
+                <q-item clickable>
+                  <q-item-section>List members</q-item-section>
+                </q-item>
+                <q-item clickable>
+                  <q-item-section>Leave Channel</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
           <span class="q-subtitle-1 q-pl-md">
-            {{ activeChannel }}
+            {{ activeChannel }} <q-icon name="navigate_next"/>
           </span>
+          </q-btn>
         </q-toolbar>
       </q-header>
 
@@ -42,6 +54,9 @@
                 </q-item>
                 <q-item clickable @click="offline">
                   <q-item-section>Go offline</q-item-section>
+                </q-item>
+                <q-item clickable @click="dndState">
+                  <q-item-section>DND</q-item-section>
                 </q-item>
                 <q-item clickable @click="online">
                   <q-item-section>Go back online</q-item-section>
@@ -109,7 +124,6 @@
               v-ripple
               @click="showInvite(invite_item)"
             >
-
               <q-item-section side >
                 {{ invite_item }}
               </q-item-section>
@@ -244,11 +258,14 @@ export default defineComponent({
       this.goOnline()
       this.loading = false
     },
+    dndState () {
+      this.goDndState()
+    },
     ...mapMutations('channels', {
       setActiveChannel: 'SET_ACTIVE'
     }),
     ...mapActions('auth', ['logout']),
-    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline', 'leave', 'join', 'sendCommand', 'acceptInvite', 'removeInvite'])
+    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline', 'goDndState', 'leave', 'join', 'sendCommand', 'acceptInvite', 'removeInvite'])
   }
 })
 </script>
