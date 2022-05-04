@@ -15,7 +15,7 @@
             <q-avatar color="primary" text-color="white">G</q-avatar>
             <q-menu auto-close :offset="[-30, 8]">
               <q-list style="min-width: 150px">
-                <q-item clickable>
+                <q-item clickable @click="inviteUserForm">
                   <q-item-section>Invite user...</q-item-section>
                 </q-item>
                 <q-item clickable @click="listMembers">
@@ -103,6 +103,20 @@
               <q-card-actions align="right">
                 <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
                 <q-btn flat label="Create Channel" color="primary" @click="joinChannel()" v-close-popup></q-btn>
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+
+          <q-dialog v-model="inviteUserFormDialog" persistent>
+            <q-card>
+              <q-card-section class="row items-center">
+                <span class="q-ml-sm">Enter username to invite to this channel</span>
+                <q-input outlined v-model="userToInvite" label="username"/>
+              </q-card-section>
+
+              <q-card-actions align="right">
+                <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
+                <q-btn flat label="Invite" color="primary" @click="inviteUser()" v-close-popup></q-btn>
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -211,7 +225,9 @@ export default defineComponent({
       invite: ref(false),
       leaveConfirm: ref(false),
       joinChannelFormDialog: ref(false),
-      channelToJoin: ''
+      channelToJoin: '',
+      inviteUserFormDialog: ref(false),
+      userToInvite: ''
     }
   },
   computed: {
@@ -281,6 +297,22 @@ export default defineComponent({
       }
       this.message = ''
       this.loading = false
+    },
+    inviteUserForm () {
+      this.inviteUserFormDialog = true
+    },
+    async inviteUser () {
+      if (this.userToInvite) {
+        const response = await this.sendCommand({ channel: this.activeChannel, command: '/invite', params: [this.userToInvite] }).then(() => {
+          this.$q.notify({
+            color: 'green-4',
+            icon: 'done',
+            position: 'top-right',
+            message: 'Invite sent!'
+          })
+          this.userToInvite = ''
+        })
+      }
     },
     joinChannelForm () {
       this.joinChannelFormDialog = true
