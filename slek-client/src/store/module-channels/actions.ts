@@ -24,9 +24,16 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       commit('CLEAR_CHANNEL', c)
     })
   },
-  async addMessage ({ commit }, { channel, message }: { channel: string, message: RawMessage }) {
+  async addMessage ({ commit, getters }, { channel, message }: { channel: string, message: RawMessage }) {
     const newMessage = await channelService.in(channel)?.addMessage(message)
-    commit('NEW_MESSAGE', { channel, message: newMessage })
+    console.log('recieved message response')
+    console.log(newMessage)
+    console.log(getters.joinedChannels)
+    if (newMessage) {
+      commit('NEW_MESSAGE', { channel, message: newMessage })
+    } else {
+      commit('CLEAR_CHANNEL', channel)
+    }
   },
   async getInvite ({ commit }, channel: string) {
     try {
