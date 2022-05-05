@@ -27,7 +27,7 @@ export default class MessageController {
     const latest_message = (await this.messageRepository.getAll(params.name)).pop()
     if(latest_message){
       const diff = DateTime.now().diff(DateTime.fromISO(latest_message!.createdAt), ['days']).days
-      if (diff >= 30.0 && params.name !== 'general') {
+      if (diff >= 0.0 && params.name !== 'general') {
         console.log('Deleting channel')
         const channel = await Channel.findByOrFail('name', params.name)
         const user = await User.findByOrFail('id', channel.owner_id)
@@ -56,4 +56,6 @@ export default class MessageController {
 
 
   }
+
+
 }

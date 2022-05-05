@@ -29,6 +29,12 @@ class ActivitySocketManager extends SocketManager {
       store.dispatch('users/updateStateOrCreateUser', { state: 'DND', user })
     })
 
+    this.socket.on('deletedChannel', (channelName: string) => {
+      store.commit('channels/CLEAR_CHANNEL', channelName)
+      console.log('Lets delete this channel!')
+      console.log(channelName)
+    })
+
     authManager.onChange((token) => {
       if (token) {
         this.socket.connect()
@@ -44,6 +50,11 @@ class ActivitySocketManager extends SocketManager {
 
   public notifyChannelChange (userNickname: string, channel: string): Promise<SerializedMessage> {
     return this.emitAsync('onInvite', userNickname, channel)
+  }
+
+  public broadcastChannelDelete (channel: string) {
+    console.log('SENDING deletion request')
+    return this.emitAsync('deleteChannel', channel)
   }
 }
 

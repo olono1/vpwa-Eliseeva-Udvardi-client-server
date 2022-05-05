@@ -103,4 +103,9 @@ export default class ActivityController {
       }
     }
   }
+
+  public async deleteChannel({ params, socket, auth }: WsContextContract, channel: string) {
+    console.log('Got message to delete on BE')
+    socket.broadcast.emit('deletedChannel', channel)
+  }
 }

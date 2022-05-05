@@ -21,6 +21,11 @@ import { mapActions } from 'vuex'
 
 export default defineComponent({
   name: 'ChannelMessagesComponent',
+  data () {
+    return {
+      messagesLoaded: this.messages
+    }
+  },
   props: {
     messages: {
       type: Array as PropType<SerializedMessage[]>,
@@ -31,6 +36,7 @@ export default defineComponent({
     messages: {
       handler () {
         this.$nextTick(() => this.scrollMessages())
+        console.log(this.messages)
       },
       deep: true
     }
@@ -46,7 +52,7 @@ export default defineComponent({
   methods: {
     scrollMessages () {
       const area = this.$refs.area as QScrollArea
-      area && area.setScrollPercentage('vertical', 1.1)
+      area && area.setScrollPercentage('vertical', 1.3)
     },
     isMine (message: SerializedMessage): boolean {
       return message.author.id === this.currentUser

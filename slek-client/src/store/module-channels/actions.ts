@@ -33,6 +33,7 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       commit('NEW_MESSAGE', { channel, message: newMessage })
     } else {
       commit('CLEAR_CHANNEL', channel)
+      activityService.broadcastChannelDelete(channel)
     }
   },
   async getInvite ({ commit }, channel: string) {
