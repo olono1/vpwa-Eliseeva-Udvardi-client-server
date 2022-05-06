@@ -98,11 +98,23 @@
               <q-card-section class="row items-center">
                 <span class="q-ml-sm">Enter the name of the channel:</span>
                 <q-input outlined v-model="channelToJoin" label="Channel name"/>
+                <q-toggle
+                  v-model="privateChannel"
+                  color="blue"
+                  checked-icon="lock"
+                  unchecked-icon="public"
+                  label="Set channel as private"
+                />
               </q-card-section>
 
               <q-card-actions align="right">
                 <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
-                <q-btn flat label="Create Channel" color="primary" @click="joinChannel()" v-close-popup></q-btn>
+                <q-btn
+                  flat
+                  :label="privateChannel? 'Create Private Channel': 'Create Public Channel'"
+                  color="primary"
+                  @click="joinChannel()"
+                  v-close-popup></q-btn>
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -227,7 +239,8 @@ export default defineComponent({
       joinChannelFormDialog: ref(false),
       channelToJoin: '',
       inviteUserFormDialog: ref(false),
-      userToInvite: ''
+      userToInvite: '',
+      privateChannel: ref(false)
     }
   },
   computed: {
@@ -276,7 +289,12 @@ export default defineComponent({
         const params = this.message.split(' ')
         if (this.commands.includes(params[0])) {
           console.log('Command')
-          const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: params.slice(1) })
+          const paramsToSend = [
+            params[1],
+            { isPrivate: (params[2] !== undefined && params[2] === 'private') }
+          ]
+
+          const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: paramsToSend })
           console.log(response)
           if (response.status === 200 && params[0] === '/join') {
             this.join(params[1])
@@ -319,7 +337,7 @@ export default defineComponent({
     },
     async joinChannel () {
       if (this.channelToJoin) {
-        const response = await this.sendCommand({ channel: this.activeChannel, command: '/join', params: [this.channelToJoin] })
+        const response = await this.sendCommand({ channel: this.activeChannel, command: '/join', params: [this.channelToJoin, { isPrivate: this.privateChannel }] })
         if (response.status === 200) {
           this.join(this.channelToJoin)
           this.channelToJoin = ''
@@ -333,6 +351,9 @@ export default defineComponent({
         })
         this.channelToJoin = ''
       }
+    },
+    privateChannelText () :string {
+      return this.privateChannel ? 'Create Private Channel' : 'Create Public Channel'
     },
     showLeaveConfirmation () {
       if (this.activeChannel === 'general') {

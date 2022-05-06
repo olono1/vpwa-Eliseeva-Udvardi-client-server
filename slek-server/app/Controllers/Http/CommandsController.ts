@@ -9,7 +9,7 @@ export default class CommandsController {
   async cancel({ request }: HttpContextContract) {
     console.log('GOT CANCEL REQUEST')
     console.log(request.body())
-    const channel = await Channel.findByOrFail('name', request.body().params[0])
+    const channel = await Channel.findByOrFail('name', request.body().channel)
     console.log(channel)
     const user = await User.findByOrFail('id', request.body().user.id)
     const info = await Database.from('channel_users')
@@ -74,7 +74,7 @@ export default class CommandsController {
 
   async join({ request }: HttpContextContract) {
     console.log("GOT JOIN REQUEST")
-    // console.log(request)
+    // console.log(request.body())
     let channel = await Channel.findBy('name', request.body().params[0])
     if (channel == null){
       channel = await Channel.create({name: request.body().params[0] as string, owner_id: request.body().user.id as number})
