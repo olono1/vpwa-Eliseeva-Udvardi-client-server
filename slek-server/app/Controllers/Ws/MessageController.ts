@@ -43,6 +43,4 @@ export default class MessageController {
     // return message to sender
     return message
   }
-
-
 }
