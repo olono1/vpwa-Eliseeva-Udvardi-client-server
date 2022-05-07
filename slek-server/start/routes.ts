@@ -41,3 +41,4 @@ Route.group(() => {
 
 Route.post('joinedChannels', 'CommandsController.getJoinedChannels')
 Route.post('invitedChannels', 'CommandsController.getInvitedChannels')
+Route.post('channelOwner', 'CommandsCotroller.getChannelOwner')

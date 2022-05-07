@@ -11,13 +11,25 @@
             @click="leftDrawerOpen = !leftDrawerOpen"
           />
 
-          <q-btn round flat>
+          <q-btn flat>
             <q-avatar color="primary" text-color="white">G</q-avatar>
-          </q-btn>
-
+            <q-menu auto-close :offset="[-30, 8]">
+              <q-list style="min-width: 150px">
+                <q-item clickable @click="inviteUserForm">
+                  <q-item-section>Invite user...</q-item-section>
+                </q-item>
+                <q-item clickable @click="listMembers">
+                  <q-item-section>List members</q-item-section>
+                </q-item>
+                <q-item clickable @click="showLeaveConfirmation">
+                  <q-item-section>Leave Channel</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
           <span class="q-subtitle-1 q-pl-md">
-            {{ activeChannel }}
+            {{ activeChannel }} <q-icon name="navigate_next"/>
           </span>
+          </q-btn>
         </q-toolbar>
       </q-header>
 
@@ -33,8 +45,10 @@
           </q-avatar>
 
           <q-space />
-
-          <q-btn round flat icon="more_vert">
+          <q-btn flat icon="add_circle" @click="joinChannelForm" >
+            Join
+          </q-btn>
+          <q-btn  flat icon="more_vert">
             <q-menu auto-close :offset="[110, 8]">
               <q-list style="min-width: 150px">
                 <q-item clickable @click="logout">
@@ -42,6 +56,9 @@
                 </q-item>
                 <q-item clickable @click="offline">
                   <q-item-section>Go offline</q-item-section>
+                </q-item>
+                <q-item clickable @click="dndState">
+                  <q-item-section>DND</q-item-section>
                 </q-item>
                 <q-item clickable @click="online">
                   <q-item-section>Go back online</q-item-section>
@@ -59,6 +76,59 @@
               <q-card-actions align="right">
                 <q-btn flat label="Do not accept" color="primary" @click="leaveInvite(activeChannel)" v-close-popup></q-btn>
                 <q-btn flat label="Accept" color="primary" @click="joinInvite(activeChannel)" v-close-popup></q-btn>
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+
+          <q-dialog v-model="leaveConfirm" persistent>
+            <q-card>
+              <q-card-section class="row items-center">
+                <span class="q-ml-sm">Are you sure you want to Leave this channel?</span>
+              </q-card-section>
+
+              <q-card-actions align="right">
+                <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
+                <q-btn flat label="Yes, leave channel" color="primary" @click="leaveChannel()" v-close-popup></q-btn>
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+
+          <q-dialog v-model="joinChannelFormDialog" persistent>
+            <q-card>
+              <q-card-section class="row items-center">
+                <span class="q-ml-sm">Enter the name of the channel:</span>
+                <q-input outlined v-model="channelToJoin" label="Channel name"/>
+                <q-toggle
+                  v-model="privateChannel"
+                  color="blue"
+                  checked-icon="lock"
+                  unchecked-icon="public"
+                  label="Set channel as private"
+                />
+              </q-card-section>
+
+              <q-card-actions align="right">
+                <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
+                <q-btn
+                  flat
+                  :label="privateChannel? 'Create Private Channel': 'Create Public Channel'"
+                  color="primary"
+                  @click="joinChannel()"
+                  v-close-popup></q-btn>
+              </q-card-actions>
+            </q-card>
+          </q-dialog>
+
+          <q-dialog v-model="inviteUserFormDialog" persistent>
+            <q-card>
+              <q-card-section class="row items-center">
+                <span class="q-ml-sm">Enter username to invite to this channel</span>
+                <q-input outlined v-model="userToInvite" label="username"/>
+              </q-card-section>
+
+              <q-card-actions align="right">
+                <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
+                <q-btn flat label="Invite" color="primary" @click="inviteUser()" v-close-popup></q-btn>
               </q-card-actions>
             </q-card>
           </q-dialog>
@@ -110,8 +180,7 @@
               style="background-color: orange"
               @click="showInvite(invite_item)"
             >
-
-              <q-item-section side>
+              <q-item-section side >
                 {{ invite_item }}
               </q-item-section>
             </q-item>
@@ -166,7 +235,13 @@ export default defineComponent({
       commands: ['/join', '/invite', '/revoke', '/kick', '/quit', '/cancel', '/list'],
       users: [],
       alert: ref(false),
-      invite: ref(false)
+      invite: ref(false),
+      leaveConfirm: ref(false),
+      joinChannelFormDialog: ref(false),
+      channelToJoin: '',
+      inviteUserFormDialog: ref(false),
+      userToInvite: '',
+      privateChannel: ref(false)
     }
   },
   computed: {
@@ -215,7 +290,12 @@ export default defineComponent({
         const params = this.message.split(' ')
         if (this.commands.includes(params[0])) {
           console.log('Command')
-          const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: params.slice(1), user: this.$store.state.auth.user })
+          const paramsToSend = [
+            params[1],
+            { isPrivate: (params[2] !== undefined && params[2] === 'private') }
+          ]
+
+          const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: paramsToSend })
           console.log(response)
           if (response.status === 200 && params[0] === '/join') {
             this.join(params[1])
@@ -240,6 +320,71 @@ export default defineComponent({
       this.message = ''
       this.loading = false
     },
+    inviteUserForm () {
+      this.inviteUserFormDialog = true
+    },
+    async inviteUser () {
+      if (this.userToInvite) {
+        const response = await this.sendCommand({ channel: this.activeChannel, command: '/invite', params: [this.userToInvite] }).then(() => {
+          this.$q.notify({
+            color: 'green-4',
+            icon: 'done',
+            position: 'top-right',
+            message: 'Invite sent!'
+          })
+          this.userToInvite = ''
+        })
+      }
+    },
+    joinChannelForm () {
+      this.joinChannelFormDialog = true
+    },
+    async joinChannel () {
+      if (this.channelToJoin) {
+        const response = await this.sendCommand({ channel: this.activeChannel, command: '/join', params: [this.channelToJoin, { isPrivate: this.privateChannel }] })
+        if (response.status === 200) {
+          this.join(this.channelToJoin)
+          this.channelToJoin = ''
+        }
+      } else {
+        this.$q.notify({
+          color: 'orange-4',
+          icon: 'warn',
+          position: 'top-right',
+          message: 'Please enter a channel name'
+        })
+        this.channelToJoin = ''
+      }
+    },
+    privateChannelText () :string {
+      return this.privateChannel ? 'Create Private Channel' : 'Create Public Channel'
+    },
+    showLeaveConfirmation () {
+      if (this.activeChannel === 'general') {
+        this.$q.notify({
+          color: 'blue-4',
+          icon: 'info',
+          position: 'top-right',
+          message: 'You cannot leave the general channel. '
+        })
+      } else {
+        this.leaveConfirm = true
+      }
+    },
+    async leaveChannel () {
+      const response = await this.sendCommand({ channel: this.activeChannel, command: '/cancel', params: [this.activeChannel] })
+      if (response.status === 200) {
+        this.leave(this.activeChannel)
+      }
+    },
+    async listMembers () {
+      console.log(this.activeChannel)
+      const response = await this.sendCommand({ channel: this.activeChannel, command: '/list' })
+      if (response.data) {
+        this.users = response.data
+        this.alert = true
+      }
+    },
     offline () {
       this.goOffline()
       this.loading = true
@@ -248,11 +393,23 @@ export default defineComponent({
       this.goOnline()
       this.loading = false
     },
+    dndState () {
+      this.goDndState()
+    },
     ...mapMutations('channels', {
       setActiveChannel: 'SET_ACTIVE'
     }),
     ...mapActions('auth', ['logout']),
-    ...mapActions('channels', ['addMessage', 'goOffline', 'goOnline', 'leave', 'join', 'sendCommand', 'acceptInvite', 'removeInvite'])
+    ...mapActions('channels', [
+      'addMessage',
+      'goOffline',
+      'goOnline',
+      'goDndState',
+      'leave',
+      'join',
+      'sendCommand',
+      'acceptInvite',
+      'removeInvite'])
   }
 })
 </script>

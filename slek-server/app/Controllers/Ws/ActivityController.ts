@@ -68,6 +68,9 @@ export default class ActivityController {
       
       socket.broadcast.emit('user:stateOnline', auth.user)
     }
+    if (reason === 'DND') {
+      socket.broadcast.emit('user:stateDND', auth.user)
+    }
 
 
     logger.info('User wentOffline', reason);
@@ -118,5 +121,10 @@ export default class ActivityController {
         break;
       }
     }
+  }
+
+  public async deleteChannel({ params, socket, auth }: WsContextContract, channel: string) {
+    console.log('Got message to delete on BE')
+    socket.broadcast.emit('deletedChannel', channel)
   }
 }

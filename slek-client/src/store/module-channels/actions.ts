@@ -24,9 +24,17 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       commit('CLEAR_CHANNEL', c)
     })
   },
-  async addMessage ({ commit }, { channel, message }: { channel: string, message: RawMessage }) {
+  async addMessage ({ commit, getters }, { channel, message }: { channel: string, message: RawMessage }) {
     const newMessage = await channelService.in(channel)?.addMessage(message)
-    commit('NEW_MESSAGE', { channel, message: newMessage })
+    console.log('recieved message response')
+    console.log(newMessage)
+    console.log(getters.joinedChannels)
+    if (newMessage) {
+      commit('NEW_MESSAGE', { channel, message: newMessage })
+    } else {
+      commit('CLEAR_CHANNEL', channel)
+      activityService.broadcastChannelDelete(channel)
+    }
   },
   async getInvite ({ commit }, channel: string) {
     try {
@@ -61,11 +69,18 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
     })
     activityService.notifyStateChange('offline')
   },
+  async goDndState () {
+    activityService.notifyStateChange('DND')
+  },
   async goOnline ({ getters, commit }) {
     console.log('GO ONLINE')
     try {
       const joining: string[] = getters.joinedChannels
       const selectedChannel: string = getters.activeChannel
+      const leaving: string[] = getters.joinedChannels
+      leaving.forEach((c) => {
+        channelService.leave(c)
+      })
       joining.forEach(async (c) => {
         commit('CLEAR_CHANNEL', c)
         commit('LOADING_START')

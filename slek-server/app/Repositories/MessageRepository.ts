@@ -1,6 +1,8 @@
 import type { MessageRepositoryContract, SerializedMessage } from '@ioc:Repositories/MessageRepository'
 import Channel from 'App/Models/Channel'
 
+
+
 export default class MessageRepository implements MessageRepositoryContract {
   public async getAll(channelName: string): Promise<SerializedMessage[]> {
     const channel = await Channel.query()
