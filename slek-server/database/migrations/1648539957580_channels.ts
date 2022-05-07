@@ -13,6 +13,7 @@ export default class Channels extends BaseSchema {
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')
+      table.boolean('is_private')
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

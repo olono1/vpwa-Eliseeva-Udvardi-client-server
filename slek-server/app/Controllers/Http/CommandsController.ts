@@ -76,8 +76,9 @@ export default class CommandsController {
     console.log("GOT JOIN REQUEST")
     // console.log(request.body())
     let channel = await Channel.findBy('name', request.body().params[0])
+    const creatingNewChannel = (channel === null)
     if (channel == null){
-      channel = await Channel.create({name: request.body().params[0] as string, owner_id: request.body().user.id as number})
+      channel = await Channel.create({name: request.body().params[0] as string, owner_id: request.body().user.id as number, is_private: request.body().params[1].isPrivate})
     } 
     const user = await User.findByOrFail('id', request.body().user.id)
     const info = await Database.from('channel_users')
@@ -91,14 +92,17 @@ export default class CommandsController {
                     .where('user_id', user.id)
                     .andWhere('channel_id', channel.id)
                     .update('user_state', userStatus.MEMBER)
-    } else {
+      return {join: false, reason: 'User already in Channel', icon: 'done'}
+    } else if (!channel.is_private || creatingNewChannel) {
       await user.related('channels').attach([channel.id]) // funguje insert do DB
       await Database.from('channel_users')
                     .where('user_id', user.id)
                     .andWhere('channel_id', channel.id)
                     .update('user_state', userStatus.MEMBER)
                     .update('kicks', 0)
+      return {join: true, reason: 'Joined channel', icon: 'done'}
     }
+    return {join: false, reason: 'Channel is private', icon: 'lock'}
   }
   
   async invite({ request }: HttpContextContract) {

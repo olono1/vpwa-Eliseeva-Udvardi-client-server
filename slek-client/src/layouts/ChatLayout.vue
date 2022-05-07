@@ -293,18 +293,20 @@ export default defineComponent({
             params[1],
             { isPrivate: (params[2] !== undefined && params[2] === 'private') }
           ]
-
-          const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: paramsToSend })
-          console.log(response)
-          if (response.status === 200 && params[0] === '/join') {
-            this.join(params[1])
-          }
-          if (response.status === 200 && params[0] === '/cancel') {
-            this.leave(params[1])
-          }
-          if (response.data && params[0] === '/list') {
-            this.users = response.data
-            this.alert = true
+          if (params[0] === '/join') {
+            this.channelToJoin = params[1]
+            this.privateChannel = (params[2] !== undefined && params[2] === 'private')
+            this.joinChannel()
+          } else {
+            const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: paramsToSend })
+            console.log(response)
+            if (response.status === 200 && params[0] === '/cancel') {
+              this.leave(params[1])
+            }
+            if (response.data && params[0] === '/list') {
+              this.users = response.data
+              this.alert = true
+            }
           }
         }
       } else {
@@ -336,11 +338,24 @@ export default defineComponent({
       this.joinChannelFormDialog = true
     },
     async joinChannel () {
+      console.log('Called function joinChannel')
       if (this.channelToJoin) {
         const response = await this.sendCommand({ channel: this.activeChannel, command: '/join', params: [this.channelToJoin, { isPrivate: this.privateChannel }] })
-        if (response.status === 200) {
+        if (response.status === 200 && response.data.join) {
           this.join(this.channelToJoin)
-          this.channelToJoin = ''
+          this.$q.notify({
+            color: 'green-4',
+            icon: response.data.icon,
+            position: 'top-right',
+            message: response.data.reason
+          })
+        } else if (response.data.join === false) {
+          this.$q.notify({
+            color: 'blue-4',
+            icon: response.data.icon,
+            position: 'top-right',
+            message: 'Cannot join channel: ' + response.data.reason
+          })
         }
       } else {
         this.$q.notify({
@@ -349,8 +364,8 @@ export default defineComponent({
           position: 'top-right',
           message: 'Please enter a channel name'
         })
-        this.channelToJoin = ''
       }
+      this.channelToJoin = ''
     },
     privateChannelText () :string {
       return this.privateChannel ? 'Create Private Channel' : 'Create Public Channel'
