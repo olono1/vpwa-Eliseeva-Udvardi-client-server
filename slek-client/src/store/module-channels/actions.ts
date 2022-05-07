@@ -98,6 +98,7 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
     const response = await channelService.command(channel, command, params)
     if (response.status === 200 && command === '/invite') {
       console.log(response.data)
+      console.log('Inviting user with parameters: params[0]: ' + params[0] + 'and channel: ' + channel)
       activityService.notifyInvite(params[0], channel)
     }
     if (user) {

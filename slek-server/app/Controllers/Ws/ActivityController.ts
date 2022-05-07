@@ -101,6 +101,12 @@ export default class ActivityController {
 
   public async onInvite({ socket, auth, logger }: WsContextContract, userNickname: string, channel: string) {
     // all connections for the same authenticated user will be in the room
+    console.log('Dostal som, ze mam pozvat: ' + userNickname + ' Do channel: ' + channel)
+    console.log('A ja sa volam: ' + auth.user?.nickname)
+
+    if (userNickname === auth.user?.nickname) {
+      console.error('POSIELAME POZVANKU ROVANKEMU USEROVI')
+    }
     const user = await User.findBy('nickname', userNickname)
     const room = this.getUserRoom(user)
     // add this socket to user room
@@ -117,7 +123,8 @@ export default class ActivityController {
       console.log(user.id)
       if (remoteSocket.data.userId === user.id){
         remoteSocket.emit('user:invite', user, channel)
-        console.log('NASIEL SOM')
+        console.log('NASIEL SOM SOCKET')
+
         break;
       }
     }
