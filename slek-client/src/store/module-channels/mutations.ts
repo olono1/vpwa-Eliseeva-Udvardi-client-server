@@ -26,7 +26,9 @@ const mutation: MutationTree<ChannelsStateInterface> = {
     state.messages[channel].push(message)
   },
   GET_INVITE (state, channel: string) {
-    state.invites?.push(channel)
+    if (state.invites?.indexOf(channel) === -1) { // Add only unique values
+      state.invites?.push(channel)
+    }
   },
   ACCEPT_INVITE (state, channel: string) {
     state.invites?.splice(state.invites?.indexOf(channel), 1)
