@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex'
 import { StateInterface } from '../index'
 import { ChannelsStateInterface } from './state'
 import { channelService, activityService } from 'src/services'
-import { RawMessage } from 'src/contracts'
+import { RawMessage, User } from 'src/contracts'
 
 const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
   async join ({ commit }, channel: string) {
@@ -94,12 +94,16 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       throw err
     }
   },
-  async sendCommand ({ commit }, { channel, command, params }: { channel: string, command: string, params: Array<string> }) {
+  async sendCommand ({ commit, dispatch }, { channel, command, params, user }: { channel: string, command: string, params: Array<string>, user?: User }) {
     const response = await channelService.command(channel, command, params)
     if (response.status === 200 && command === '/invite') {
       console.log(response.data)
-      activityService.notifyChannelChange(params[0], channel)
+      activityService.notifyInvite(params[0], channel)
     }
+    if (user) {
+      activityService.notifyChannelChange(user?.nickname, channel)
+    }
+    // await dispatch('auth/check', '', { root: true })
     return response
   }
 }

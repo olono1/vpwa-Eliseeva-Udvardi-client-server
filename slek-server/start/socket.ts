@@ -13,6 +13,7 @@ Ws.namespace('/')
   .connected('ActivityController.onConnected')
   .disconnected('ActivityController.onDisconnected')
   .on('goOffline', 'ActivityController.goOffline')
+  .on('onChannelChange', 'ActivityController.onChannelChange')
   .on('onInvite', 'ActivityController.onInvite')
   .on('deleteChannel', 'ActivityController.deleteChannel')
 

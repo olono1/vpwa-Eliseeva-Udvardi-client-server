@@ -32,10 +32,12 @@ export default class CommandsController {
   }
 
   async quit({ request }: HttpContextContract) {
-    const channel = await Channel.findByOrFail('name', request.body().params[0])
+    const channel = await Channel.findByOrFail('name', request.body().channel)
     // console.log(channel)
     if (channel.owner_id == request.body().user.id){
       await channel.delete()
+    } else {
+      return 'not owner'
     }
     // await user.related('channels').detach([channel.id]) // funguje delete z DB
   }

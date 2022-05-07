@@ -177,6 +177,7 @@
               :key="index"
               clickable
               v-ripple
+              style="background-color: orange"
               @click="showInvite(invite_item)"
             >
               <q-item-section side >
@@ -264,7 +265,7 @@ export default defineComponent({
       console.log('came to join invite on fe')
       if (this.invites != null) {
         this.acceptInvite(channel)
-        const response = await this.sendCommand({ channel: channel, command: '/join', params: [channel] })
+        const response = await this.sendCommand({ channel, command: '/join', params: [channel] })
         if (response.status === 200) {
           this.join(channel)
         }
@@ -274,7 +275,7 @@ export default defineComponent({
       this.leave(channel)
       if (this.invites != null) {
         this.removeInvite(channel)
-        const response = await this.sendCommand({ channel: channel, command: '/cancel', params: [channel] })
+        const response = await this.sendCommand({ channel, command: '/cancel', params: [channel] })
         if (response.status === 200) {
           this.leave(channel)
         }
@@ -299,15 +300,19 @@ export default defineComponent({
             this.joinChannel()
           } else {
             const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: paramsToSend })
-            console.log(response)
             if (response.status === 200 && params[0] === '/cancel') {
               this.leave(params[1])
+            }
+            if ((response.status === 200 && params[0] === '/quit' && response.data !== 'not owner')) {
+              this.leave(this.activeChannel)
             }
             if (response.data && params[0] === '/list') {
               this.users = response.data
               this.alert = true
             }
           }
+
+
         }
       } else {
         if (this.activeChannel != null) {
