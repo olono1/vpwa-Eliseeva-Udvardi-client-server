@@ -311,8 +311,6 @@ export default defineComponent({
               this.alert = true
             }
           }
-
-
         }
       } else {
         if (this.activeChannel != null) {
