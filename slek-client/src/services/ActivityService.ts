@@ -57,6 +57,7 @@ class ActivitySocketManager extends SocketManager {
   }
 
   public notifyInvite (userNickname: string, channel: string): Promise<SerializedMessage> {
+    console.log('Emmiting Async with username: ' + userNickname + 'and channel: ' + channel)
     return this.emitAsync('onInvite', userNickname, channel)
   }
 
