@@ -22,7 +22,6 @@ export default class MessageController {
   }
 
   public async addMessage({ params, socket, auth }: WsContextContract, content: string) {
-
     console.log('Latest message')
     const latest_message = (await this.messageRepository.getAll(params.name)).pop()
     if(latest_message){
@@ -34,27 +33,15 @@ export default class MessageController {
         await channel.delete()
         await user.related('channels').detach([channel.id])
         return ''
-      } else {
-        console.log('No delete')
-        const message = await this.messageRepository.create(params.name, auth.user!.id, content)
-        // broadcast message to other users in channel
-        socket.broadcast.emit('message', message)
-
-        // return message to sender
-        return message
       }
-    } else {
-      console.log('No delete')
-      const message = await this.messageRepository.create(params.name, auth.user!.id, content)
-      // broadcast message to other users in channel
-      socket.broadcast.emit('message', message)
-
-      // return message to sender
-      return message
     }
+    console.log('No delete')
+    const message = await this.messageRepository.create(params.name, auth.user!.id, content)
+    // broadcast message to other users in channel
+    socket.broadcast.emit('message', message)
 
-
-
+    // return message to sender
+    return message
   }
 
 

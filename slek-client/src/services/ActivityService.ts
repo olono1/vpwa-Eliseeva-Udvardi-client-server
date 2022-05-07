@@ -52,8 +52,8 @@ class ActivitySocketManager extends SocketManager {
     return this.emitAsync('goOffline', newState)
   }
 
-  public notifyChannelChange (userNickname: string, channel: string): Promise<SerializedMessage> {
-    return this.emitAsync('onChannelChange', userNickname, channel)
+  public notifyChannelChange (): Promise<SerializedMessage> {
+    return this.emitAsync('onChannelChange')
   }
 
   public notifyInvite (userNickname: string, channel: string): Promise<SerializedMessage> {

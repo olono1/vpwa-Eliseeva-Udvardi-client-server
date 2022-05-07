@@ -345,7 +345,7 @@ export default defineComponent({
       if (this.channelToJoin) {
         const response = await this.sendCommand({ channel: this.activeChannel, command: '/join', params: [this.channelToJoin, { isPrivate: this.privateChannel }] })
         if (response.status === 200 && response.data.join) {
-          this.join(this.channelToJoin)
+          // this.join(this.channelToJoin)
           this.$q.notify({
             color: 'green-4',
             icon: response.data.icon,
@@ -374,16 +374,16 @@ export default defineComponent({
       return this.privateChannel ? 'Create Private Channel' : 'Create Public Channel'
     },
     showLeaveConfirmation () {
-      if (this.activeChannel === 'general') {
-        this.$q.notify({
-          color: 'blue-4',
-          icon: 'info',
-          position: 'top-right',
-          message: 'You cannot leave the general channel. '
-        })
-      } else {
-        this.leaveConfirm = true
-      }
+      // if (this.activeChannel === 'general') {
+      //   this.$q.notify({
+      //     color: 'blue-4',
+      //     icon: 'info',
+      //     position: 'top-right',
+      //     message: 'You cannot leave the general channel. '
+      //   })
+      // } else {
+      this.leaveConfirm = true
+      // }
     },
     async leaveChannel () {
       const response = await this.sendCommand({ channel: this.activeChannel, command: '/cancel', params: [this.activeChannel] })

@@ -101,10 +101,7 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       console.log('Inviting user with parameters: params[0]: ' + params[0] + 'and channel: ' + channel)
       activityService.notifyInvite(params[0], channel)
     }
-    if (user) {
-      activityService.notifyChannelChange(user?.nickname, channel)
-    }
-    // await dispatch('auth/check', '', { root: true })
+    activityService.notifyChannelChange()
     return response
   }
 }

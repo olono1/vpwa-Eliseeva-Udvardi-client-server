@@ -77,26 +77,9 @@ export default class ActivityController {
 
   }
 
-  public async onChannelChange({ socket, auth, logger }: WsContextContract, userNickname: string, channel: string) {
+  public async onChannelChange({ socket, auth, logger }: WsContextContract) {
     console.log('on channel change server')
-    // all connections for the same authenticated user will be in the room
-    const user = await User.findBy('nickname', userNickname)
-    const room = this.getUserRoom(user)
-
-    // add this socket to user room
-    socket.join(room)
-    // add userId to data shared between Socket.IO servers
-    // https://socket.io/docs/v4/server-api/#namespacefetchsockets
-    socket.data.userId = user!.id
-
-    const allSockets = await socket.nsp.fetchSockets()
-
-    for (const remoteSocket of allSockets) {
-      console.log('PRECHDAZAM SOCKETMI')
-      console.log(remoteSocket.data)
-      console.log(user.id)
-      remoteSocket.emit('user:channels', user, channel)
-    }
+    socket.nsp.emit('user:channels', auth.user)
   }
 
   public async onInvite({ socket, auth, logger }: WsContextContract, userNickname: string, channel: string) {
@@ -115,7 +98,7 @@ export default class ActivityController {
     // https://socket.io/docs/v4/server-api/#namespacefetchsockets
     socket.data.userId = user!.id
 
-    const allSockets = await socket.nsp.fetchSockets()
+    const allSockets = await socket.broadcast.fetchSockets()
 
     for (const remoteSocket of allSockets) {
       console.log('PRECHDAZAM SOCKETMI')
@@ -124,7 +107,6 @@ export default class ActivityController {
       if (remoteSocket.data.userId === user.id){
         remoteSocket.emit('user:invite', user, channel)
         console.log('NASIEL SOM SOCKET')
-
         break;
       }
     }

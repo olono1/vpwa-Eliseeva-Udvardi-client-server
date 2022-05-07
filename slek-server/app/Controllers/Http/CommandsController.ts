@@ -9,7 +9,7 @@ export default class CommandsController {
   async cancel({ request }: HttpContextContract) {
     console.log('GOT CANCEL REQUEST')
     console.log(request.body())
-    const channel = await Channel.findByOrFail('name', request.body().channel)
+    const channel = await Channel.findByOrFail('name', request.body().params[0])
     console.log(channel)
     const user = await User.findByOrFail('id', request.body().user.id)
     const info = await Database.from('channel_users')
@@ -127,9 +127,9 @@ export default class CommandsController {
     console.log(info)
     if (info.length > 0) {
       for (const c of info) {
-        if (c.user_state == 'member') {
+        if (c.user_state == userStatus.MEMBER) {
           return
-        } else if (c.user_state == 'banned') {
+        } else if (c.user_state == userStatus.BANNED) {
           if (channel.owner_id != request.body().user.id) {
             return
           }
@@ -147,6 +147,28 @@ export default class CommandsController {
                     .andWhere('channel_id', channel.id)
                     .update('user_state', userStatus.INVITED)
                     .update('kicks', 0)
+    }
+  }
+  
+  async revoke({ request }: HttpContextContract) {
+    console.log('GOT REVOKE REQUEST')
+    // console.log(request)
+    let channel = await Channel.findByOrFail('name', request.body().channel)
+    const user = await User.findByOrFail('nickname', request.body().params[0])
+    console.log(user)
+    const info = await Database.from('channel_users')
+                                .where('user_id', user.id)
+                                .andWhere('channel_id', channel.id)
+    
+    if (channel.is_private && request.body().user.id == channel.owner_id) {
+      if (info.length > 0) {
+        if (info[0].user_state == userStatus.MEMBER) {
+          await Database.from('channel_users')
+                  .where('user_id', user.id)
+                  .andWhere('channel_id', channel.id)
+                  .update('user_state', userStatus.LEFT)
+        }
+      }
     }
   }
 
