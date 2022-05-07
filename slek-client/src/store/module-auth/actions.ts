@@ -10,9 +10,9 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
     try {
       commit('AUTH_START')
       const user = await authService.me()
-      const responseJoin = await channelService.getJoinedChannels()
-      const responseInvites = await channelService.getInvitedChannels()
       if (user?.id !== state.user?.id) {
+        const responseJoin = await channelService.getJoinedChannels()
+        const responseInvites = await channelService.getInvitedChannels()
         console.log('TU')
         console.log(responseJoin)
         for (const x of responseJoin.data) {

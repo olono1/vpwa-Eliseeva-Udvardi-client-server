@@ -1,5 +1,4 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
-import {userStatus} from 'app/Models/UserStatus'
 export default class ChannelUsers extends BaseSchema {
   protected tableName = 'channel_users'
 

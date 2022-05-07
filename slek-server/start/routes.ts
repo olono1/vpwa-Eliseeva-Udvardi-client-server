@@ -37,6 +37,7 @@ Route.group(() => {
   Route.post('list', 'CommandsController.list')
   Route.post('invite', 'CommandsController.invite')
   Route.post('quit', 'CommandsController.quit')
+  Route.post('kick', 'CommandsController.kick')
 }).prefix('command')
 
 Route.post('joinedChannels', 'CommandsController.getJoinedChannels')
