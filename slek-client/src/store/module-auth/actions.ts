@@ -16,12 +16,19 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
       console.log('TU')
       console.log(responseJoin)
       for (const x of responseJoin.data) {
-        await dispatch('channels/join', x, { root: true })
-        console.log('succsesfull join')
+        try {
+          await dispatch('channels/join', x, { root: true })
+        } catch (e) {
+          console.log("Error while joining: " + e)
+        }
       }
       console.log(responseInvites)
       for (const x of responseInvites.data) {
-        await dispatch('channels/getInvite', x, { root: true })
+        try {
+          await dispatch('channels/getInvite', x, { root: true })
+        } catch (e) {
+          console.log("Error while adding invites: " + e)
+        }
       }
       // }
       commit('AUTH_SUCCESS', user)

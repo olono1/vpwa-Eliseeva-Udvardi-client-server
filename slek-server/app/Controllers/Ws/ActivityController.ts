@@ -56,9 +56,6 @@ export default class ActivityController {
 
   public async goOffline({ socket, auth, logger }: WsContextContract, reason: string) {
     console.log('offline backend initiated')
-    const room = this.getUserRoom(auth.user!);
-    const userSockets = await socket.in(room).allSockets()
-
 
     if(reason === 'offline') {
      
@@ -77,12 +74,12 @@ export default class ActivityController {
 
   }
 
-  public async onChannelChange({ socket, auth, logger }: WsContextContract) {
+  public async onChannelChange({ socket, auth }: WsContextContract) {
     console.log('on channel change server')
     socket.nsp.emit('user:channels', auth.user)
   }
 
-  public async onInvite({ socket, auth, logger }: WsContextContract, userNickname: string, channel: string) {
+  public async onInvite({ socket, auth }: WsContextContract, userNickname: string, channel: string) {
     // all connections for the same authenticated user will be in the room
     console.log('Dostal som, ze mam pozvat: ' + userNickname + ' Do channel: ' + channel)
     console.log('A ja sa volam: ' + auth.user?.nickname)
@@ -90,7 +87,7 @@ export default class ActivityController {
     if (userNickname === auth.user?.nickname) {
       console.error('POSIELAME POZVANKU ROVANKEMU USEROVI')
     }
-    const user = await User.findBy('nickname', userNickname)
+    const user = await User.findByOrFail('nickname', userNickname)
     const room = this.getUserRoom(user)
     // add this socket to user room
     socket.join(room)
@@ -112,7 +109,7 @@ export default class ActivityController {
     }
   }
 
-  public async deleteChannel({ params, socket, auth }: WsContextContract, channel: string) {
+  public async deleteChannel({ socket }: WsContextContract, channel: string) {
     console.log('Got message to delete on BE')
     socket.broadcast.emit('deletedChannel', channel)
   }

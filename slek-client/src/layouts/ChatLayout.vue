@@ -265,20 +265,14 @@ export default defineComponent({
       console.log('came to join invite on fe')
       if (this.invites != null) {
         this.acceptInvite(channel)
-        const response = await this.sendCommand({ channel, command: '/join', params: [channel] })
-        if (response.status === 200) {
-          this.join(channel)
-        }
+        await this.sendCommand({ channel, command: '/join', params: [channel] })
       }
     },
     async leaveInvite (channel: string) {
       this.leave(channel)
       if (this.invites != null) {
         this.removeInvite(channel)
-        const response = await this.sendCommand({ channel, command: '/cancel', params: [channel] })
-        if (response.status === 200) {
-          this.leave(channel)
-        }
+        await this.sendCommand({ channel, command: '/cancel', params: [channel] })
       }
     },
     async send () {
