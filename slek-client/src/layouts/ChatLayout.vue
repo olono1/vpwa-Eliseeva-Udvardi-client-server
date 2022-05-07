@@ -107,10 +107,11 @@
               :key="index"
               clickable
               v-ripple
+              style="background-color: orange"
               @click="showInvite(invite_item)"
             >
 
-              <q-item-section side >
+              <q-item-section side>
                 {{ invite_item }}
               </q-item-section>
             </q-item>
@@ -189,7 +190,7 @@ export default defineComponent({
       console.log('came to join invite on fe')
       if (this.invites != null) {
         this.acceptInvite(channel)
-        const response = await this.sendCommand({ channel: channel, command: '/join', params: [channel] })
+        const response = await this.sendCommand({ channel, command: '/join', params: [channel] })
         if (response.status === 200) {
           this.join(channel)
         }
@@ -199,7 +200,7 @@ export default defineComponent({
       this.leave(channel)
       if (this.invites != null) {
         this.removeInvite(channel)
-        const response = await this.sendCommand({ channel: channel, command: '/cancel', params: [channel] })
+        const response = await this.sendCommand({ channel, command: '/cancel', params: [channel] })
         if (response.status === 200) {
           this.leave(channel)
         }
@@ -214,13 +215,16 @@ export default defineComponent({
         const params = this.message.split(' ')
         if (this.commands.includes(params[0])) {
           console.log('Command')
-          const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: params.slice(1) })
+          const response = await this.sendCommand({ channel: this.activeChannel, command: params[0], params: params.slice(1), user: this.$store.state.auth.user })
           console.log(response)
           if (response.status === 200 && params[0] === '/join') {
             this.join(params[1])
           }
           if (response.status === 200 && params[0] === '/cancel') {
             this.leave(params[1])
+          }
+          if ((response.status === 200 && params[0] === '/quit' && response.data !== 'not owner')) {
+            this.leave(this.activeChannel)
           }
           if (response.data && params[0] === '/list') {
             this.users = response.data

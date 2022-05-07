@@ -8,8 +8,12 @@ class ActivitySocketManager extends SocketManager {
       console.log('Online users list', onlineUsers)
     })
     this.socket.on('user:channels', (user: User, channel: string) => {
-      console.log('GOT INVITE')
+      console.log('GOT UPDATE LIST')
       store.dispatch('users/updateChannelList', { user, channel })
+    })
+    this.socket.on('user:invite', (user: User, channel: string) => {
+      console.log('GOT INVITE')
+      store.dispatch('users/getInvite', { user, channel })
     })
     this.socket.on('user:online', (user: User) => {
       console.log('User is online', user)
@@ -40,6 +44,10 @@ class ActivitySocketManager extends SocketManager {
   }
 
   public notifyChannelChange (userNickname: string, channel: string): Promise<SerializedMessage> {
+    return this.emitAsync('onChannelChange', userNickname, channel)
+  }
+
+  public notifyInvite (userNickname: string, channel: string): Promise<SerializedMessage> {
     return this.emitAsync('onInvite', userNickname, channel)
   }
 }

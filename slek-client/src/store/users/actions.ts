@@ -26,7 +26,15 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
   },
   async updateChannelList ({ dispatch }, { user, channel }: {user: User, channel: string}) {
     console.log('in user')
+    await dispatch('channels/leave', '', { root: true })
     await dispatch('auth/check', '', { root: true })
+    // await dispatch('channels/getInvite', channel, { root: true })
+    console.log(user)
+    console.log(channel)
+  },
+  async getInvite ({ dispatch }, { user, channel }: {user: User, channel: string}) {
+    console.log('in user')
+    // await dispatch('auth/check', '', { root: true })
     await dispatch('channels/getInvite', channel, { root: true })
     console.log(user)
     console.log(channel)
