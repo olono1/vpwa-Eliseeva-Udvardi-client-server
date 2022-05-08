@@ -61,7 +61,7 @@ export default defineComponent({
       if (this.userStates[email]) {
         return ' (' + this.userStates[email].userStatus + ')'
       } else {
-        return ' (online)'
+        return ' (offline)'
       }
     },
     async getStatus (email: string): Promise<string> {

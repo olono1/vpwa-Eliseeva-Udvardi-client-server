@@ -6,6 +6,9 @@ class ActivitySocketManager extends SocketManager {
   public subscribe ({ store }: BootParams): void {
     this.socket.on('user:list', (onlineUsers: User[]) => {
       console.log('Online users list', onlineUsers)
+      for (const x of onlineUsers) {
+        store.dispatch('users/updateStateOrCreateUser', { state: 'online', user: x })
+      }
     })
     this.socket.on('user:channels', (user: User, channel: string) => {
       console.log('GOT UPDATE LIST')
@@ -17,8 +20,10 @@ class ActivitySocketManager extends SocketManager {
     })
     this.socket.on('user:online', (user: User) => {
       console.log('User is online', user)
+      store.dispatch('users/updateStateOrCreateUser', { state: 'online', user })
     })
     this.socket.on('user:offline', (user: User) => {
+      store.dispatch('users/updateStateOrCreateUser', { state: 'offline', user })
       console.log('User is offline', user)
     })
     this.socket.on('user:stateOffline', (user:User) => {

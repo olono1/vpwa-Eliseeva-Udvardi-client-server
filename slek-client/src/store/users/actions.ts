@@ -8,8 +8,8 @@ const actions: ActionTree<UsersStateInterface, StateInterface> = {
     // your code
   },
   async updateStateOrCreateUser ({ commit, dispatch }, { state, user }: { state: 'offline' | 'online' | 'DND', user: User }) {
-    const isUserCreated: Promise<string> = await dispatch('getMessageAuthorStatus', user.email)
-    if (await isUserCreated) {
+    const isUserCreated = await dispatch('getMessageAuthorStatus', user.email)
+    if (isUserCreated.length > 0) {
       commit('CHANGE_STATUS', { userStatus: state, user })
     } else {
       commit('NEW_USER', { userStatus: state, user })

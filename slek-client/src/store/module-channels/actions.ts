@@ -2,7 +2,7 @@ import { ActionTree } from 'vuex'
 import { StateInterface } from '../index'
 import { ChannelsStateInterface } from './state'
 import { channelService, activityService } from 'src/services'
-import { RawMessage, User } from 'src/contracts'
+import { RawMessage } from 'src/contracts'
 
 const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
   async join ({ commit }, channel: string) {
@@ -69,8 +69,27 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
     })
     activityService.notifyStateChange('offline')
   },
-  async goDndState () {
-    activityService.notifyStateChange('DND')
+  async goDndState ({ getters, commit }) {
+    try {
+      const joining: string[] = getters.joinedChannels
+      const selectedChannel: string = getters.activeChannel
+      const leaving: string[] = getters.joinedChannels
+      leaving.forEach((c) => {
+        channelService.leave(c)
+      })
+      joining.forEach(async (c) => {
+        commit('CLEAR_CHANNEL', c)
+        commit('LOADING_START')
+        const messages = await channelService.join(c).loadMessages()
+        commit('LOADING_SUCCESS', { channel: c, messages })
+      })
+      commit('SET_ACTIVE', selectedChannel)
+      activityService.notifyStateChange('DND')
+      activityService.notifyChannelChange()
+    } catch (err) {
+      commit('LOADING_ERROR', err)
+      throw err
+    }
   },
   async goOnline ({ getters, commit }) {
     console.log('GO ONLINE')
@@ -89,19 +108,22 @@ const actions: ActionTree<ChannelsStateInterface, StateInterface> = {
       })
       commit('SET_ACTIVE', selectedChannel)
       activityService.notifyStateChange('online')
+      activityService.notifyChannelChange()
     } catch (err) {
       commit('LOADING_ERROR', err)
       throw err
     }
   },
-  async sendCommand ({ commit, dispatch }, { channel, command, params, user }: { channel: string, command: string, params: Array<string>, user?: User }) {
+  async sendCommand ({ commit, dispatch }, { channel, command, params }: { channel: string, command: string, params: Array<string> }) {
     const response = await channelService.command(channel, command, params)
     if (response.status === 200 && command === '/invite') {
       console.log(response.data)
       console.log('Inviting user with parameters: params[0]: ' + params[0] + 'and channel: ' + channel)
       activityService.notifyInvite(params[0], channel)
     }
-    activityService.notifyChannelChange()
+    if (command !== '/list') {
+      activityService.notifyChannelChange()
+    }
     return response
   }
 }

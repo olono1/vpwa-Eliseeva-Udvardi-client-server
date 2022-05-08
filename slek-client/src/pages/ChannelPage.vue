@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts">
-import ChannelMessagesComponent from 'src/components/ChannelMessagesComponent.vue'
-import { SerializedMessage } from 'src/contracts'
+import ChannelMessagesComponent from '../components/ChannelMessagesComponent.vue'
+import { SerializedMessage } from '../contracts'
 import { defineComponent } from 'vue'
 
 export default defineComponent({

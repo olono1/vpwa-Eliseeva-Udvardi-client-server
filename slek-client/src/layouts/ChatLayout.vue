@@ -320,7 +320,7 @@ export default defineComponent({
     },
     async inviteUser () {
       if (this.userToInvite) {
-        const response = await this.sendCommand({ channel: this.activeChannel, command: '/invite', params: [this.userToInvite] }).then(() => {
+        await this.sendCommand({ channel: this.activeChannel, command: '/invite', params: [this.userToInvite] }).then(() => {
           this.$q.notify({
             color: 'green-4',
             icon: 'done',
@@ -403,6 +403,7 @@ export default defineComponent({
     },
     dndState () {
       this.goDndState()
+      this.loading = false
     },
     ...mapMutations('channels', {
       setActiveChannel: 'SET_ACTIVE'

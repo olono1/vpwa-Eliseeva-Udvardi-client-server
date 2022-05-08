@@ -13,7 +13,7 @@ export default class ActivityController {
 
     // this is first connection for given user
     if (userSockets.size === 0) {
-      socket.broadcast.emit('user:online', auth.user)
+      socket.nsp.emit('user:online', auth.user)
     }
 
     // add this socket to user room
@@ -22,7 +22,7 @@ export default class ActivityController {
     // https://socket.io/docs/v4/server-api/#namespacefetchsockets
     socket.data.userId = auth.user!.id
 
-    const allSockets = await socket.nsp.except(room).fetchSockets()
+    const allSockets = await socket.nsp.fetchSockets()
     const onlineIds = new Set<number>()
 
     for (const remoteSocket of allSockets) {
@@ -34,7 +34,7 @@ export default class ActivityController {
     console.log("Sending online users")
     console.log(onlineUsers)
 
-    socket.emit('user:list', onlineUsers)
+    socket.nsp.emit('user:list', onlineUsers)
 
     logger.info('new websocket connection')
   }
@@ -47,7 +47,7 @@ export default class ActivityController {
     // user is disconnected
     if (userSockets.size === 0) {
       // notify other users
-      socket.broadcast.emit('user:offline', auth.user)
+      socket.nsp.emit('user:offline', auth.user)
     }
 
     logger.info('websocket disconnected', reason)
@@ -59,14 +59,14 @@ export default class ActivityController {
 
     if(reason === 'offline') {
      
-      socket.broadcast.emit('user:stateOffline', auth.user)
+      socket.nsp.emit('user:stateOffline', auth.user)
     }
     if (reason === 'online') {
       
-      socket.broadcast.emit('user:stateOnline', auth.user)
+      socket.nsp.emit('user:stateOnline', auth.user)
     }
     if (reason === 'DND') {
-      socket.broadcast.emit('user:stateDND', auth.user)
+      socket.nsp.emit('user:stateDND', auth.user)
     }
 
 
