@@ -5,7 +5,7 @@ import { authService, authManager, channelService, activityService } from 'src/s
 import { LoginCredentials, RegisterData } from 'src/contracts'
 
 const actions: ActionTree<AuthStateInterface, StateInterface> = {
-  async check ({ state, commit, dispatch }) {
+  async check ({ commit, dispatch }) {
     console.log('CHECK!')
     try {
       commit('AUTH_START')

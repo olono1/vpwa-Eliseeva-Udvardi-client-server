@@ -125,6 +125,9 @@ export default class CommandsController {
     
     console.log('Info')
     console.log(info)
+    if (channel.is_private && channel.owner_id != request.body().user.id) {
+      return
+    }
     if (info.length > 0) {
       for (const c of info) {
         if (c.user_state == userStatus.MEMBER) {
@@ -140,6 +143,7 @@ export default class CommandsController {
                     .andWhere('channel_id', channel.id)
                     .update('user_state', userStatus.INVITED)
                     .update('kicks', 0)
+      return 'invited'
     } else {
       await user.related('channels').attach([channel.id]) // funguje insert do DB
       await Database.from('channel_users')
@@ -147,6 +151,7 @@ export default class CommandsController {
                     .andWhere('channel_id', channel.id)
                     .update('user_state', userStatus.INVITED)
                     .update('kicks', 0)
+      return 'invited'
     }
   }
   

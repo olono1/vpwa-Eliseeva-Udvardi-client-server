@@ -63,7 +63,7 @@ class ChannelService {
       console.log('!!!!!')
       return response
     } else {
-      throw new Error("no user yet")
+      throw new Error('no user logged yet')
     }
   }
 
@@ -76,7 +76,7 @@ class ChannelService {
       console.log('!!!!!')
       return response
     } else {
-      throw new Error("no user yet")
+      throw new Error('no user logged yet')
     }
   }
 
