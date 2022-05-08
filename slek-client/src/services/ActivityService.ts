@@ -26,14 +26,6 @@ class ActivitySocketManager extends SocketManager {
       store.dispatch('users/updateStateOrCreateUser', { state: 'offline', user })
       console.log('User is offline', user)
     })
-    this.socket.on('user:stateOffline', (user:User) => {
-      store.dispatch('users/updateStateOrCreateUser', { state: 'offline', user })
-      console.log('User went status offline', user)
-      console.log(user.nickname)
-    })
-    this.socket.on('user:stateOnline', (user: User) => {
-      store.dispatch('users/updateStateOrCreateUser', { state: 'online', user })
-    })
     this.socket.on('user:stateDND', (user:User) => {
       store.dispatch('users/updateStateOrCreateUser', { state: 'DND', user })
     })

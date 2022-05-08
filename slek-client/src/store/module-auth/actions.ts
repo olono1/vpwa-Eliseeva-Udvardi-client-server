@@ -69,9 +69,9 @@ const actions: ActionTree<AuthStateInterface, StateInterface> = {
   async logout ({ commit, dispatch }) {
     try {
       commit('AUTH_START')
+      activityService.notifyStateChange('offline')
       await authService.logout()
       await dispatch('channels/leave', null, { root: true })
-      activityService.notifyStateChange('offline')
       commit('AUTH_SUCCESS', null)
       // remove api token and notify listeners
       authManager.removeToken()

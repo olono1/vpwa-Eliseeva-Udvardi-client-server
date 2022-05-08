@@ -12,9 +12,9 @@ export default class ActivityController {
     const userSockets = await socket.in(room).allSockets()
 
     // this is first connection for given user
-    if (userSockets.size === 0) {
-      socket.nsp.emit('user:online', auth.user)
-    }
+    // if (userSockets.size === 0) {
+    socket.nsp.emit('user:online', auth.user)
+    // }
 
     // add this socket to user room
     socket.join(room)
@@ -59,11 +59,11 @@ export default class ActivityController {
 
     if(reason === 'offline') {
      
-      socket.nsp.emit('user:stateOffline', auth.user)
+      socket.nsp.emit('user:offline', auth.user)
     }
     if (reason === 'online') {
       
-      socket.nsp.emit('user:stateOnline', auth.user)
+      socket.nsp.emit('user:online', auth.user)
     }
     if (reason === 'DND') {
       socket.nsp.emit('user:stateDND', auth.user)
